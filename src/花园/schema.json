@@ -1,0 +1,382 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "系统": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "日期": {
+          "default": "第1天",
+          "type": "string"
+        },
+        "时间": {
+          "default": "8:00",
+          "type": "string"
+        },
+        "星期": {
+          "default": "周一",
+          "type": "string",
+          "enum": [
+            "周一",
+            "周二",
+            "周三",
+            "周四",
+            "周五",
+            "周六",
+            "周日"
+          ]
+        },
+        "天气": {
+          "default": "晴天",
+          "type": "string"
+        },
+        "温度": {
+          "default": "21°",
+          "type": "string"
+        },
+        "组织全局": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "总资金": {
+              "type": "number"
+            },
+            "组织声望": {
+              "type": "number"
+            },
+            "近期事务": {
+              "default": {},
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "description": "近期事务名"
+              },
+              "additionalProperties": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "描述": {
+                    "default": "无",
+                    "type": "string"
+                  },
+                  "时间": {
+                    "default": "未知",
+                    "type": "string",
+                    "description": "如XX年X月X日-XX年X月X日"
+                  },
+                  "涉及部门或职务": {
+                    "default": "无",
+                    "type": "string"
+                  },
+                  "距离开始时间": {
+                    "default": "未知",
+                    "type": "string"
+                  },
+                  "距离结束时间": {
+                    "default": "未知",
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "近期大型活动": {
+              "default": {},
+              "type": "object",
+              "propertyNames": {
+                "type": "string",
+                "description": "近期大型活动名"
+              },
+              "additionalProperties": {
+                "default": {},
+                "type": "object",
+                "properties": {
+                  "描述": {
+                    "default": "无",
+                    "type": "string"
+                  },
+                  "时间": {
+                    "default": "未知",
+                    "type": "string",
+                    "description": "如XX年X月X日-XX年X月X日"
+                  },
+                  "涉及部门或职务": {
+                    "default": "无",
+                    "type": "string"
+                  },
+                  "距离开始时间": {
+                    "default": "未知",
+                    "type": "string"
+                  },
+                  "距离结束时间": {
+                    "default": "未知",
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "金缕赌场": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "经营状况": {
+              "default": "正常运营",
+              "type": "string",
+              "description": "赌场近期的运营情况描述"
+            },
+            "本周收益": {
+              "type": "number"
+            }
+          }
+        },
+        "迷迭香酒馆": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "经营状况": {
+              "default": "正常运营",
+              "type": "string",
+              "description": "酒馆及情报交易的运营情况"
+            },
+            "本周收益": {
+              "type": "number"
+            }
+          }
+        }
+      }
+    },
+    "成员名册": {
+      "default": {},
+      "type": "object",
+      "propertyNames": {
+        "type": "string",
+        "description": "成员姓名"
+      },
+      "additionalProperties": {
+        "default": {},
+        "type": "object",
+        "properties": {
+          "年龄": {
+            "type": "number"
+          },
+          "职务": {
+            "default": "待初始化",
+            "type": "string",
+            "description": "在花园组织中的职位"
+          },
+          "当前位置": {
+            "default": "待初始化",
+            "type": "string"
+          },
+          "贡献度": {
+            "type": "number"
+          },
+          "资金": {
+            "type": "number"
+          },
+          "好感度": {
+            "type": "number"
+          },
+          "忠诚度": {
+            "type": "number"
+          },
+          "短期目标": {
+            "default": "无",
+            "type": "string"
+          },
+          "中期目标": {
+            "default": "无",
+            "type": "string"
+          },
+          "之后行程": {
+            "default": "无",
+            "type": "string"
+          },
+          "身体状况": {
+            "default": {},
+            "type": "object",
+            "properties": {
+              "总体": {
+                "default": "正常",
+                "type": "string"
+              },
+              "口": {
+                "default": "正常",
+                "type": "string"
+              },
+              "胸": {
+                "default": "正常",
+                "type": "string"
+              },
+              "小穴": {
+                "default": "正常",
+                "type": "string"
+              },
+              "足": {
+                "default": "正常",
+                "type": "string"
+              },
+              "后庭": {
+                "default": "正常",
+                "type": "string"
+              }
+            }
+          },
+          "内心想法": {
+            "default": "无",
+            "type": "string"
+          },
+          "着装": {
+            "default": {},
+            "type": "object",
+            "properties": {
+              "上衣": {
+                "default": "待初始化",
+                "type": "string"
+              },
+              "下装": {
+                "default": "待初始化",
+                "type": "string"
+              },
+              "袜": {
+                "default": "待初始化",
+                "type": "string"
+              },
+              "鞋": {
+                "default": "待初始化",
+                "type": "string"
+              },
+              "配饰": {
+                "default": "待初始化",
+                "type": "string"
+              }
+            }
+          },
+          "是否怀孕": {
+            "type": "boolean"
+          },
+          "立绘状态": {
+            "default": {},
+            "type": "object",
+            "properties": {
+              "主类型": {
+                "default": "日常",
+                "type": "string",
+                "enum": [
+                  "日常",
+                  "服装",
+                  "性事"
+                ]
+              },
+              "次类型": {
+                "default": "普通",
+                "type": "string"
+              },
+              "差分序号": {
+                "default": "1",
+                "type": "string",
+                "enum": [
+                  "1",
+                  "2"
+                ]
+              }
+            }
+          },
+          "是否在场": {
+            "type": "boolean"
+          },
+          "背包物品": {
+            "default": {},
+            "type": "object",
+            "propertyNames": {
+              "type": "string",
+              "description": "物品名"
+            },
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "描述": {
+                  "default": "未描述物品",
+                  "type": "string"
+                },
+                "数量": {
+                  "default": 1,
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "主角": {
+      "default": {},
+      "type": "object",
+      "properties": {
+        "职务": {
+          "default": "花园主人",
+          "type": "string"
+        },
+        "当前位置": {
+          "default": "主宅邸四楼",
+          "type": "string"
+        },
+        "贡献度": {
+          "type": "number"
+        },
+        "资金": {
+          "type": "number"
+        },
+        "着装": {
+          "default": {},
+          "type": "object",
+          "properties": {
+            "上衣": {
+              "default": "待初始化",
+              "type": "string"
+            },
+            "下装": {
+              "default": "待初始化",
+              "type": "string"
+            },
+            "袜": {
+              "default": "待初始化",
+              "type": "string"
+            },
+            "鞋": {
+              "default": "待初始化",
+              "type": "string"
+            },
+            "配饰": {
+              "default": "待初始化",
+              "type": "string"
+            }
+          }
+        },
+        "背包物品": {
+          "default": {},
+          "type": "object",
+          "propertyNames": {
+            "type": "string",
+            "description": "物品名"
+          },
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "描述": {
+                "default": "未描述物品",
+                "type": "string"
+              },
+              "数量": {
+                "default": 1,
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
