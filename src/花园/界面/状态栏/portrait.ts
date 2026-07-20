@@ -23,9 +23,7 @@ export type PortraitState = {
 
 export function normalizePortraitState(portraitState: unknown): PortraitState {
   const raw =
-    typeof portraitState === 'object' && portraitState !== null
-      ? (portraitState as Record<string, unknown>)
-      : {};
+    typeof portraitState === 'object' && portraitState !== null ? (portraitState as Record<string, unknown>) : {};
 
   let main = String(raw.主类型 || '日常') as PortraitMain;
   if (!PORTRAIT_MAINS.includes(main)) main = '日常';
@@ -52,7 +50,9 @@ export function buildPortraitUrl(
   portraitState: unknown,
   options: { baseUrl?: string; ext?: string } = {},
 ): string | null {
-  const base = String(options.baseUrl || '').trim().replace(/\/+$/, '');
+  const base = String(options.baseUrl || '')
+    .trim()
+    .replace(/\/+$/, '');
   if (!base) return null;
 
   const ext = String(options.ext || 'png').replace(/^\./, '') || 'png';

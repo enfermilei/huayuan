@@ -99,7 +99,11 @@
                     <span class="data-value">{{ detail.portraitSub }}</span>
                   </div>
                 </div>
-                <blockquote class="id-thought" :class="{ expanded: thoughtExpanded }" @click="thoughtExpanded = !thoughtExpanded">
+                <blockquote
+                  class="id-thought"
+                  :class="{ expanded: thoughtExpanded }"
+                  @click="thoughtExpanded = !thoughtExpanded"
+                >
                   <span class="id-thought-label">内心想法</span>
                   <p>{{ detail.thought }}</p>
                   <span class="id-thought-hint">{{ thoughtExpanded ? '收起' : '展开' }}</span>
@@ -140,14 +144,18 @@
                       <span class="inv-desc">{{ item.desc }}</span>
                       <span class="inv-badge">{{ item.badge }}</span>
                     </div>
-                    <div v-if="detail.bag.length === 0" class="inv-desc" style="opacity: 0.5; padding: 10px">背包空空如也</div>
+                    <div v-if="detail.bag.length === 0" class="inv-desc" style="opacity: 0.5; padding: 10px">
+                      背包空空如也
+                    </div>
                   </div>
                 </div>
               </template>
             </div>
 
             <footer class="id-card-footer">
-              <button class="id-footer-btn ghost" type="button" @click="emit('openRoster', detail.name)">打开名册</button>
+              <button class="id-footer-btn ghost" type="button" @click="emit('openRoster', detail.name)">
+                打开名册
+              </button>
               <button class="id-footer-btn" type="button" @click="emit('close')">收起身份卡</button>
             </footer>
           </section>

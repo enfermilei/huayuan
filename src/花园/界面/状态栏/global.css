@@ -1683,7 +1683,10 @@ body {
   letter-spacing: 0.4px;
   color: var(--text-secondary);
   cursor: pointer;
-  transition: transform 0.2s var(--ease-spring), background 0.2s, color 0.2s;
+  transition:
+    transform 0.2s var(--ease-spring),
+    background 0.2s,
+    color 0.2s;
 }
 
 #garden-mvu-root .map-filter-chip:hover {
@@ -1839,10 +1842,26 @@ body {
   box-shadow: 0 3px 10px rgba(80, 100, 60, 0.12);
 }
 
-#garden-mvu-root .map-pan-up { top: 12px; left: 50%; transform: translateX(-50%); }
-#garden-mvu-root .map-pan-down { bottom: 12px; left: 50%; transform: translateX(-50%); }
-#garden-mvu-root .map-pan-left { left: 12px; top: 50%; transform: translateY(-50%); }
-#garden-mvu-root .map-pan-right { right: 12px; top: 50%; transform: translateY(-50%); }
+#garden-mvu-root .map-pan-up {
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+#garden-mvu-root .map-pan-down {
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+#garden-mvu-root .map-pan-left {
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+#garden-mvu-root .map-pan-right {
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+}
 
 #garden-mvu-root .map-zoom-controls {
   position: absolute;
@@ -1865,7 +1884,9 @@ body {
   line-height: 1;
   cursor: pointer;
   box-shadow: 0 2px 8px rgba(60, 80, 50, 0.12);
-  transition: background 0.15s ease, transform 0.12s ease;
+  transition:
+    background 0.15s ease,
+    transform 0.12s ease;
 }
 
 #garden-mvu-root .map-zoom-btn:hover {
@@ -1895,7 +1916,9 @@ body {
   background: rgba(255, 255, 255, 0.45);
   cursor: pointer;
   text-align: left;
-  transition: background 0.15s ease, border-color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease;
 }
 
 #garden-mvu-root .map-link-row:hover {
@@ -1965,12 +1988,14 @@ body {
 }
 
 #garden-mvu-root .map-road-pavement {
-  transition: stroke 0.2s ease, filter 0.2s ease;
+  transition:
+    stroke 0.2s ease,
+    filter 0.2s ease;
 }
 
 #garden-mvu-root .map-road-pavement.hovered,
 #garden-mvu-root .map-road-pavement.active {
-  stroke: #C9B896 !important;
+  stroke: #c9b896 !important;
   filter: brightness(1.06);
 }
 
@@ -2118,17 +2143,17 @@ body {
 }
 
 #garden-mvu-root .map-landmark.selected .map-shape {
-  stroke: #E87A5D !important;
+  stroke: #e87a5d !important;
   stroke-width: 3.5;
 }
 
 #garden-mvu-root .map-landmark.linked .map-shape {
-  stroke: #C9A227 !important;
+  stroke: #c9a227 !important;
   stroke-width: 3;
 }
 
 #garden-mvu-root .map-landmark.has-user .map-shape {
-  stroke: #F5906E !important;
+  stroke: #f5906e !important;
   stroke-width: 3;
 }
 
@@ -2137,7 +2162,9 @@ body {
 }
 
 #garden-mvu-root .map-landmark .map-shape {
-  transition: stroke-width 0.22s ease, filter 0.22s ease;
+  transition:
+    stroke-width 0.22s ease,
+    filter 0.22s ease;
 }
 
 #garden-mvu-root .map-landmark.occupied .map-label-bg {
@@ -2200,7 +2227,7 @@ body {
 #garden-mvu-root .map-label {
   font-size: 12px;
   font-weight: 800;
-  fill: #3A2E22;
+  fill: #3a2e22;
   pointer-events: none;
 }
 
@@ -2220,13 +2247,13 @@ body {
 }
 
 #garden-mvu-root .map-badge-circle {
-  fill: #E87A5D;
+  fill: #e87a5d;
   stroke: #fff;
   stroke-width: 1.6;
 }
 
 #garden-mvu-root .map-badge-circle.user {
-  fill: #F5906E;
+  fill: #f5906e;
   animation: map-badge-glow 2.4s ease-in-out infinite;
 }
 
@@ -2629,8 +2656,12 @@ body {
   gap: 10px;
   padding: 12px 14px;
   border-radius: var(--radius-md);
-  background:
-    linear-gradient(165deg, rgba(255, 248, 240, 0.97) 0%, rgba(245, 232, 218, 0.96) 55%, rgba(232, 220, 205, 0.95) 100%);
+  background: linear-gradient(
+    165deg,
+    rgba(255, 248, 240, 0.97) 0%,
+    rgba(245, 232, 218, 0.96) 55%,
+    rgba(232, 220, 205, 0.95) 100%
+  );
   border: 1px solid rgba(255, 255, 255, 0.75);
   box-shadow: 0 12px 36px rgba(60, 45, 30, 0.18);
   overflow: hidden;
@@ -2677,7 +2708,10 @@ body {
   background: rgba(255, 255, 255, 0.5);
   cursor: pointer;
   text-align: left;
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.15s ease;
 }
 
 #garden-mvu-root .mansion-floor-tab:hover {
@@ -2735,7 +2769,10 @@ body {
   border: 1.5px solid rgba(140, 110, 80, 0.35);
   background: rgba(255, 252, 246, 0.82);
   cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
   overflow: hidden;
   box-sizing: border-box;
 }
@@ -2746,7 +2783,7 @@ body {
 }
 
 #garden-mvu-root .mansion-room.selected {
-  border-color: #E87A5D;
+  border-color: #e87a5d;
   box-shadow: 0 0 0 2px rgba(232, 122, 93, 0.28);
   background: rgba(255, 240, 230, 0.95);
 }
@@ -2946,8 +2983,12 @@ body {
 }
 
 @keyframes gmvuIdOverlayIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 #garden-mvu-root .id-card-modal {
@@ -2958,8 +2999,7 @@ body {
   padding: 0;
   background:
     radial-gradient(at 18% 20%, rgba(255, 220, 200, 0.55) 0px, transparent 45%),
-    radial-gradient(at 85% 80%, rgba(210, 220, 250, 0.4) 0px, transparent 50%),
-    rgba(255, 248, 240, 0.94);
+    radial-gradient(at 85% 80%, rgba(210, 220, 250, 0.4) 0px, transparent 50%), rgba(255, 248, 240, 0.94);
   animation: gmvuIdCardIn 0.45s var(--ease-bounce) both;
 }
 
@@ -2971,8 +3011,14 @@ body {
 }
 
 @keyframes gmvuIdCardIn {
-  from { opacity: 0; transform: translateY(18px) scale(0.96); }
-  to { opacity: 1; transform: translateY(0) scale(1); }
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
 #garden-mvu-root .id-card-close {
@@ -2993,7 +3039,9 @@ body {
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: var(--shadow-glass);
-  transition: transform 0.25s var(--ease-spring), background 0.25s;
+  transition:
+    transform 0.25s var(--ease-spring),
+    background 0.25s;
 }
 
 #garden-mvu-root .id-card-close:hover {
@@ -3164,13 +3212,17 @@ body {
   background: var(--glass-bg-subtle);
   border: 1px solid rgba(255, 255, 255, 0.5);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
-  transition: transform 0.25s var(--ease-spring), box-shadow 0.25s;
+  transition:
+    transform 0.25s var(--ease-spring),
+    box-shadow 0.25s;
   cursor: default;
 }
 
 #garden-mvu-root .id-meter:hover {
   transform: translateY(-2px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 8px 18px rgba(200, 150, 120, 0.18);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.7),
+    0 8px 18px rgba(200, 150, 120, 0.18);
 }
 
 #garden-mvu-root .id-meter-top {
@@ -3193,7 +3245,9 @@ body {
 }
 
 #garden-mvu-root .id-meter .progress-bar .fill {
-  transition: width 0.55s var(--ease-spring), filter 0.3s;
+  transition:
+    width 0.55s var(--ease-spring),
+    filter 0.3s;
 }
 
 #garden-mvu-root .id-meter .progress-bar .fill.is-hover {
@@ -3221,7 +3275,10 @@ body {
   font-size: 0.85rem;
   font-weight: 800;
   letter-spacing: 1px;
-  transition: background 0.25s var(--ease-spring), color 0.25s, transform 0.2s;
+  transition:
+    background 0.25s var(--ease-spring),
+    color 0.25s,
+    transform 0.2s;
 }
 
 #garden-mvu-root .id-tab:hover {
@@ -3231,7 +3288,9 @@ body {
 #garden-mvu-root .id-tab.active {
   background: linear-gradient(135deg, #ffe0cc, #ffc5a8);
   color: var(--text-dark);
-  box-shadow: 0 4px 12px rgba(230, 160, 130, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow:
+    0 4px 12px rgba(230, 160, 130, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
   transform: translateY(-1px);
 }
 
@@ -3268,7 +3327,9 @@ body {
   background: linear-gradient(135deg, rgba(255, 236, 220, 0.7), rgba(244, 235, 255, 0.45));
   border-left: 3px solid var(--color-peach-deep);
   cursor: pointer;
-  transition: box-shadow 0.25s, transform 0.25s var(--ease-spring);
+  transition:
+    box-shadow 0.25s,
+    transform 0.25s var(--ease-spring);
 }
 
 #garden-mvu-root .id-thought:hover {
@@ -3326,7 +3387,9 @@ body {
   border-radius: var(--radius-md);
   background: var(--glass-bg-subtle);
   border: 1px solid rgba(255, 255, 255, 0.5);
-  transition: transform 0.25s var(--ease-spring), box-shadow 0.25s;
+  transition:
+    transform 0.25s var(--ease-spring),
+    box-shadow 0.25s;
 }
 
 #garden-mvu-root .id-goal:hover {
@@ -3422,12 +3485,16 @@ body {
   box-shadow:
     0 8px 18px rgba(230, 160, 130, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.7);
-  transition: transform 0.25s var(--ease-spring), box-shadow 0.25s;
+  transition:
+    transform 0.25s var(--ease-spring),
+    box-shadow 0.25s;
 }
 
 #garden-mvu-root .id-footer-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(230, 160, 130, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  box-shadow:
+    0 12px 24px rgba(230, 160, 130, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 #garden-mvu-root .id-footer-btn:active {

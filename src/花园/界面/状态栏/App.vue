@@ -21,12 +21,7 @@
       @open-roster="openRoster"
     />
     <RosterPanel v-if="panel === 'roster'" :focus-name="focusName" @close="closePanel" />
-    <MapPanel
-      v-if="panel === 'map'"
-      @close="closePanel"
-      @open-identity="openIdentity"
-      @open-roster="openRoster"
-    />
+    <MapPanel v-if="panel === 'map'" @close="closePanel" @open-identity="openIdentity" @open-roster="openRoster" />
     <SettingsPanel v-if="panel === 'settings'" @close="closePanel" />
   </div>
 </template>

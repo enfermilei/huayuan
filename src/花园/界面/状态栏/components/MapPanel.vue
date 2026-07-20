@@ -214,7 +214,13 @@
             <rect :width="MAP_SIZE" :height="MAP_SIZE" fill="url(#mapLawn)" />
             <rect :width="MAP_SIZE" :height="MAP_SIZE" fill="url(#mapGrassDot)" />
             <!-- 斜阳光晕 -->
-            <rect class="map-sun-flare" :width="MAP_SIZE" :height="MAP_SIZE" fill="url(#mapSunFlare)" pointer-events="none" />
+            <rect
+              class="map-sun-flare"
+              :width="MAP_SIZE"
+              :height="MAP_SIZE"
+              fill="url(#mapSunFlare)"
+              pointer-events="none"
+            />
 
             <!-- 规划网格 -->
             <g class="map-grid" opacity="0.22">
@@ -761,9 +767,7 @@ const selectedRoom = computed(
 );
 
 /** 当前楼层有楼层信息但未匹配到具体房间的人员 */
-const floorUnassigned = computed(() =>
-  peopleOnFloor(mansionFloor.value).filter(p => !p.roomId),
-);
+const floorUnassigned = computed(() => peopleOnFloor(mansionFloor.value).filter(p => !p.roomId));
 
 /** 当前高亮道路：选中地标相连 + 悬停/点选道路 */
 const activeRoadIds = computed(() => {
@@ -942,11 +946,10 @@ function selectLandmark(id: string) {
 function openInteriorForSelection() {
   const user = people.value.find(p => p.key === 'user');
   const prefer =
-    user?.landmarkId === 'mansion' && user.floor
-      ? user.floor
-      : peopleAt('mansion').find(p => p.floor)?.floor || 1;
+    user?.landmarkId === 'mansion' && user.floor ? user.floor : peopleAt('mansion').find(p => p.floor)?.floor || 1;
   mansionFloor.value = prefer;
-  selectedRoomId.value = user?.landmarkId === 'mansion' ? user.roomId : peopleAt('mansion').find(p => p.roomId)?.roomId || null;
+  selectedRoomId.value =
+    user?.landmarkId === 'mansion' ? user.roomId : peopleAt('mansion').find(p => p.roomId)?.roomId || null;
   interiorOpen.value = true;
 }
 

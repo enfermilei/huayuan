@@ -51,7 +51,9 @@
           </div>
         </div>
       </article>
-      <div v-if="characters.length === 0" style="opacity: 0.5; padding: 20px; margin: auto">当前没有在宅邸内的组织成员</div>
+      <div v-if="characters.length === 0" style="opacity: 0.5; padding: 20px; margin: auto">
+        当前没有在宅邸内的组织成员
+      </div>
     </div>
   </section>
 </template>

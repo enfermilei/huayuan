@@ -7,9 +7,7 @@ const CustomLandmarkSchema = z
     x: z.coerce.number().prefault(0),
     y: z.coerce.number().prefault(0),
     blurb: z.string().prefault(''),
-    region: z
-      .enum(['core', 'south', 'southeast', 'west', 'north', 'medical', 'custom'])
-      .prefault('custom'),
+    region: z.enum(['core', 'south', 'southeast', 'west', 'north', 'medical', 'custom']).prefault('custom'),
   })
   .prefault({
     id: '',

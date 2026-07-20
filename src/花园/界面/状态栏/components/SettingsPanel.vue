@@ -34,7 +34,9 @@
         <label class="settings-row settings-row-stack">
           <span>
             <span class="settings-label">立绘资源基址</span>
-            <span class="settings-hint">目录 URL，文件名格式：角色名-主类型-次类型-差分（如 小明-日常-普通-1.png）</span>
+            <span class="settings-hint"
+              >目录 URL，文件名格式：角色名-主类型-次类型-差分（如 小明-日常-普通-1.png）</span
+            >
           </span>
           <input
             v-model="settings.portraitBaseUrl"

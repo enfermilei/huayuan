@@ -4,9 +4,7 @@ const Settings = z
     enableEnterAnim: z.boolean().prefault(true),
     rosterPreferPresent: z.boolean().prefault(true),
     /** 立绘资源目录；文件名：`角色名-主类型-次类型-差分.ext`。本地开发可改回 http://127.0.0.1:5500/portraits */
-    portraitBaseUrl: z
-      .string()
-      .prefault('https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@main/portraits'),
+    portraitBaseUrl: z.string().prefault('https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@main/portraits'),
     /** 立绘扩展名，不含点，默认 png */
     portraitExt: z.string().prefault('png'),
   })

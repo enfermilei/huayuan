@@ -67,13 +67,20 @@
           </div>
 
           <div class="progress-with-label">
-            <div class="top"><span class="name">好感</span><span class="num font-mono">{{ detail.like }}</span></div>
+            <div class="top">
+              <span class="name">好感</span><span class="num font-mono">{{ detail.like }}</span>
+            </div>
             <div class="progress-bar">
-              <div class="fill pink" :style="{ '--target-width': `${detail.likePct}%`, width: `${detail.likePct}%` }"></div>
+              <div
+                class="fill pink"
+                :style="{ '--target-width': `${detail.likePct}%`, width: `${detail.likePct}%` }"
+              ></div>
             </div>
           </div>
           <div class="progress-with-label">
-            <div class="top"><span class="name">忠诚</span><span class="num font-mono">{{ detail.loyal }}</span></div>
+            <div class="top">
+              <span class="name">忠诚</span><span class="num font-mono">{{ detail.loyal }}</span>
+            </div>
             <div class="progress-bar">
               <div
                 class="fill"
