@@ -40,7 +40,7 @@
             v-model="settings.portraitBaseUrl"
             class="settings-input"
             type="url"
-            placeholder="https://testingcf.jsdelivr.net/gh/feixingbingmao/huayuan@main/portraits"
+            placeholder="http://127.0.0.1:5500/portraits"
           />
         </label>
 
