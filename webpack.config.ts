@@ -552,6 +552,8 @@ function parse_configuration(entry: Entry): (_env: any, argv: any) => webpack.Co
       }
       const cdn = {
         sass: 'https://jspm.dev/sass',
+        // 钉死 pinia@3：unpinned /npm/pinia/+esm 会解析到 pinia@4，缺少 __VUE_PROD_DEVTOOLS__ 导致状态栏白屏
+        pinia: 'https://testingcf.jsdelivr.net/npm/pinia@3.0.4/+esm',
       };
       return callback(
         null,

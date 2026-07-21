@@ -1,4 +1,10 @@
-<head></head>
+<head>
+  <!-- pinia CDN / MagVarUpdate 需要这些全局绑定，否则模块加载失败导致白屏 -->
+  <script>
+    var __VUE_PROD_DEVTOOLS__ = false;
+    var __VUE_OPTIONS_API__ = true;
+  </script>
+</head>
 <body>
   <div id="app"></div>
 </body>

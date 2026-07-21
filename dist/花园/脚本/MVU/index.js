@@ -1,1 +1,2 @@
-import'https://testingcf.jsdelivr.net/gh/MagicalAstrogy/MagVarUpdate/artifact/bundle.js';
+import*as r from'https://testingcf.jsdelivr.net/gh/MagicalAstrogy/MagVarUpdate/artifact/bundle.js';var t={205(t){t.exports=r}},e={};function a(r){var s=e[r];if(void 0!==s)return s.exports;var o=e[r]={exports:{}};return t[r](o,o.exports,a),o.exports}(0,eval)('var __VUE_PROD_DEVTOOLS__ = false; var __VUE_OPTIONS_API__ = true;'),Promise.resolve().then(a.bind(a,205));
+//# sourceMappingURL=index.js.map
