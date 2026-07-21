@@ -55,7 +55,11 @@ export function buildPortraitUrl(
     .replace(/\/+$/, '');
   if (!base) return null;
 
+  const character = String(name || '').trim();
+  if (!character) return null;
+
   const ext = String(options.ext || 'png').replace(/^\./, '') || 'png';
-  const stem = portraitFileStem(name, portraitState);
-  return `${base}/${encodeURIComponent(stem)}.${ext}`;
+  const stem = portraitFileStem(character, portraitState);
+  // 资源约定：portraits/{角色名}/{角色名}-{主类型}-{次类型}-{差分}.ext
+  return `${base}/${encodeURIComponent(character)}/${encodeURIComponent(stem)}.${ext}`;
 }

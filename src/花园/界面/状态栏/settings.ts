@@ -1,12 +1,21 @@
+export const DEFAULT_PORTRAIT_BASE =
+  'https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@main/portraits';
+
 const Settings = z
   .object({
     showThoughts: z.boolean().prefault(true),
     enableEnterAnim: z.boolean().prefault(true),
     rosterPreferPresent: z.boolean().prefault(true),
-    /** 立绘资源目录；文件名：`角色名-主类型-次类型-差分.ext`。本地开发可改回 http://127.0.0.1:5500/portraits */
-    portraitBaseUrl: z.string().prefault('https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@main/portraits'),
+    /** 立绘资源根目录；文件在 `{base}/{角色名}/{角色名}-主类型-次类型-差分.ext` */
+    portraitBaseUrl: z
+      .string()
+      .prefault(DEFAULT_PORTRAIT_BASE)
+      .transform(s => s.trim() || DEFAULT_PORTRAIT_BASE),
     /** 立绘扩展名，不含点，默认 png */
-    portraitExt: z.string().prefault('png'),
+    portraitExt: z
+      .string()
+      .prefault('png')
+      .transform(s => s.trim().replace(/^\./, '') || 'png'),
   })
   .prefault({});
 

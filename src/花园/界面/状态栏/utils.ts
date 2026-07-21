@@ -52,7 +52,7 @@ export function isPresent(value: unknown): boolean {
 }
 
 /**
- * 立绘 URL：`{portraitBaseUrl}/{角色名-主类型-次类型-差分}.{ext}`
+ * 立绘 URL：`{portraitBaseUrl}/{角色名}/{角色名-主类型-次类型-差分}.{ext}`
  * 未配置基址时返回 placehold（文案为期望文件名，便于对照资源）
  */
 export function resolvePortrait(
@@ -61,20 +61,21 @@ export function resolvePortrait(
   size: 'card' | 'full' = 'card',
   options?: { baseUrl?: string; ext?: string },
 ): string {
-  let baseUrl = String(options?.baseUrl ?? '');
-  let ext = String(options?.ext ?? 'png');
+  let baseUrl = String(options?.baseUrl ?? '').trim();
+  let ext = String(options?.ext ?? '').trim();
 
-  if (!options) {
+  // options 里若传了空串（历史 localStorage），仍回退到设置默认值
+  if (!baseUrl || !ext) {
     try {
       const store = useSettingsStore();
-      baseUrl = String(store.settings.portraitBaseUrl || '');
-      ext = String(store.settings.portraitExt || 'png');
+      if (!baseUrl) baseUrl = String(store.settings.portraitBaseUrl || '');
+      if (!ext) ext = String(store.settings.portraitExt || 'png');
     } catch {
       /* pinia 未就绪 */
     }
   }
 
-  const real = buildPortraitUrl(name, portraitState, { baseUrl, ext });
+  const real = buildPortraitUrl(name, portraitState, { baseUrl, ext: ext || 'png' });
   if (real) return real;
 
   const state = normalizePortraitState(portraitState);

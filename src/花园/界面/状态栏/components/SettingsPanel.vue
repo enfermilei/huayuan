@@ -35,14 +35,15 @@
           <span>
             <span class="settings-label">立绘资源基址</span>
             <span class="settings-hint"
-              >目录 URL，文件名格式：角色名-主类型-次类型-差分（如 小明-日常-普通-1.png）</span
+              >资源根目录；路径为 {基址}/{角色名}/{角色名}-主类型-次类型-差分.png。本地可改
+              http://127.0.0.1:5500/portraits；留空则恢复 CDN 默认</span
             >
           </span>
           <input
             v-model="settings.portraitBaseUrl"
             class="settings-input"
             type="url"
-            placeholder="http://127.0.0.1:5500/portraits"
+            placeholder="https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@main/portraits"
           />
         </label>
 
