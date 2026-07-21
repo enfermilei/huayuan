@@ -2,5 +2,5 @@
 (0, eval)('var __VUE_PROD_DEVTOOLS__ = false; var __VUE_OPTIONS_API__ = true;');
 void import(
   /* webpackIgnore: true */
-  'https://testingcf.jsdelivr.net/gh/MagicalAstrogy/MagVarUpdate/artifact/bundle.js',
+  'https://testingcf.jsdelivr.net/gh/MagicalAstrogy/MagVarUpdate/artifact/bundle.js'
 );
