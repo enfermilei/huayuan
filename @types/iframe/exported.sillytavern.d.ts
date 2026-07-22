@@ -26,14 +26,25 @@ declare namespace SillyTavern {
   };
 
   type SendingMessage = {
-    role: 'user' | 'assistant' | 'system';
-    content:
+    role: 'user' | 'assistant' | 'system' | 'tool';
+
+    content?:
       | string
       | Array<
           | { type: 'text'; text: string }
           | { type: 'image_url'; image_url: { url: string; detail: 'auto' | 'low' | 'high' } }
           | { type: 'video_url'; video_url: { url: string } }
         >;
+
+    tool_call_id?: string;
+    tool_calls?: Array<{
+      id: string;
+      type: 'function';
+      function: {
+        name: string;
+        arguments: string;
+      };
+    }>;
   };
 
   type FlattenedWorldInfoEntry = {
@@ -152,7 +163,7 @@ declare namespace SillyTavern {
     /** the name of the book */
     name: string;
     /** the entries of the book */
-    entries: v2DataWorldInfoEntry[];
+    entries: Record<number, v2DataWorldInfoEntry>;
   };
 
   /**
@@ -413,7 +424,17 @@ declare const SillyTavern: {
     once: typeof eventOnce;
   };
   readonly eventTypes: typeof tavern_events;
-  readonly addOneMessage: (mes: object, options: any) => Promise<void>;
+  readonly addOneMessage: (
+    mes: SillyTavern.ChatMessage,
+    options?: {
+      type?: 'swipe';
+      insertAfter?: number;
+      scroll?: true;
+      insertBefore?: number;
+      forceId?: number;
+      showSwipes?: boolean;
+    },
+  ) => JQuery<HTMLElement>;
   readonly deleteLastMessage: () => Promise<void>;
   readonly generate: Function;
   readonly sendStreamingRequest: (type: string, data: object) => Promise<void>;
@@ -557,6 +578,7 @@ declare const SillyTavern: {
     response_length?: number,
     force_chid?: number,
   ) => Promise<string>;
+  /** 严禁使用本方法修改角色卡的 `extensions` 字段, 它会合并原有值和新值而不是替换; 应该使用 `updateCharacterWith` */
   readonly writeExtensionField: (character_id: number, key: string, value: any) => Promise<void>;
   readonly getThumbnailUrl: (type: any, file: any) => string;
   readonly selectCharacterById: (id: number, { switchMenu }?: { switchMenu?: boolean }) => Promise<void>;
@@ -571,7 +593,7 @@ declare const SillyTavern: {
   ) => string;
   readonly shouldSendOnEnter: () => boolean;
   readonly isMobile: () => boolean;
-  readonly t: (strings: string, ...values: any[]) => string;
+  readonly t: (strings: TemplateStringsArray, ...values: any[]) => string;
   readonly translate: (text: string, key?: string | null) => string;
   readonly getCurrentLocale: () => string;
   readonly addLocaleData: (localeId: string, data: Record<string, string>) => void;
