@@ -1,5 +1,4 @@
-export const DEFAULT_PORTRAIT_BASE =
-  'https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@main/portraits';
+export const DEFAULT_PORTRAIT_BASE = 'https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@main/portraits';
 
 const Settings = z
   .object({
