@@ -44,8 +44,7 @@
             <div>
               <span class="settings-label">自定义立绘</span>
               <span class="settings-hint"
-                >本机保存，优先于官方图。新角色缺图、或想替换现有立绘时在此添加。建议
-                832×1216，支持 png/jpg/webp</span
+                >本机保存，优先于官方图。新角色缺图、或想替换现有立绘时在此添加。建议 832×1216，支持 png/jpg/webp</span
               >
             </div>
           </div>
@@ -211,11 +210,7 @@ async function savePortrait() {
       await customStore.upsert(stem, form.file);
       replaceTarget.value = null;
     } else {
-      await customStore.upsertFor(
-        character,
-        { 主类型: form.main, 次类型: form.sub, 差分序号: form.diff },
-        form.file,
-      );
+      await customStore.upsertFor(character, { 主类型: form.main, 次类型: form.sub, 差分序号: form.diff }, form.file);
     }
     form.file = null;
     if (fileInput.value) fileInput.value.value = '';

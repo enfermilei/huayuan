@@ -65,11 +65,7 @@ export function isPresent(value: unknown): boolean {
  * 3. 官方 CDN `{base}/{角色名}/{stem}.png`
  * 4. placehold 占位
  */
-export function resolvePortrait(
-  name: string,
-  portraitState: unknown,
-  size: 'card' | 'full' = 'card',
-): string {
+export function resolvePortrait(name: string, portraitState: unknown, size: 'card' | 'full' = 'card'): string {
   let safeMode = false;
   try {
     const settings = useSettingsStore();
@@ -88,8 +84,7 @@ export function resolvePortrait(
   }
 
   const originalR18 = isR18Portrait(portraitState);
-  const state =
-    safeMode && originalR18 ? SAFE_PORTRAIT_STATE : normalizePortraitState(portraitState);
+  const state = safeMode && originalR18 ? SAFE_PORTRAIT_STATE : normalizePortraitState(portraitState);
   const stem = portraitFileStem(name, state);
 
   const custom = customUrls[stem];
