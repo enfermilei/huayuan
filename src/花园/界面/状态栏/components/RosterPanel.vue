@@ -191,6 +191,7 @@ watch(filteredMembers, list => {
 });
 
 const detail = computed(() => {
+  void settings.value.safeMode;
   const m = members.value.find(x => x.name === selected.value);
   if (!m) return null;
   const d = m.raw;
@@ -225,10 +226,7 @@ const detail = computed(() => {
     pregnant: Boolean(_.get(d, '是否怀孕', false)),
     portraitMain: String(_.get(d, '立绘状态.主类型', '日常')),
     portraitSub: String(_.get(d, '立绘状态.次类型', '普通')),
-    src: resolvePortrait(m.name, _.get(d, '立绘状态', {}), 'card', {
-      baseUrl: settings.value.portraitBaseUrl,
-      ext: settings.value.portraitExt,
-    }),
+    src: resolvePortrait(m.name, _.get(d, '立绘状态', {}), 'card'),
     body,
     outfit: (['上衣', '下装', '袜', '鞋', '配饰'] as const)
       .map(k => String(outfitObj[k] || ''))

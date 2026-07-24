@@ -1,5 +1,6 @@
 import { waitUntil } from 'async-wait-until';
 import App from './App.vue';
+import { useCustomPortraitsStore } from './customPortraits';
 import './global.css';
 
 function showBootShell(message: string, isError = false) {
@@ -21,7 +22,12 @@ $(async () => {
       timeout: 120_000,
       intervalBetweenAttempts: 50,
     });
-    createApp(App).use(createPinia()).mount('#app');
+
+    const pinia = createPinia();
+    const app = createApp(App);
+    app.use(pinia);
+    await useCustomPortraitsStore(pinia).init();
+    app.mount('#app');
   } catch (error) {
     console.error('[花园状态栏] 启动失败', error);
     showBootShell('花园终端启动失败: 等待 MVU / stat_data 超时。请确认已启用「花园 MVU」「花园变量结构」脚本。', true);

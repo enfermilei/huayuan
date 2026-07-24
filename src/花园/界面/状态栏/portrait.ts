@@ -45,6 +45,21 @@ export function portraitFileStem(name: string, portraitState: unknown): string {
   return `${name}-${主类型}-${次类型}-${差分序号}`;
 }
 
+/** 性事全系列 + 裸体服装视为 R18，安全模式下隐藏 */
+export function isR18Portrait(portraitState: unknown): boolean {
+  const { 主类型, 次类型 } = normalizePortraitState(portraitState);
+  if (主类型 === '性事') return true;
+  if (主类型 === '服装' && 次类型 === '裸体') return true;
+  return false;
+}
+
+/** 安全模式回退目标：日常-普通-1 */
+export const SAFE_PORTRAIT_STATE: PortraitState = {
+  主类型: '日常',
+  次类型: '普通',
+  差分序号: '1',
+};
+
 export function buildPortraitUrl(
   name: string,
   portraitState: unknown,

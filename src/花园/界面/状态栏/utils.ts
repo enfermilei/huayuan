@@ -1,5 +1,12 @@
-import { buildPortraitUrl, normalizePortraitState, portraitFileStem } from './portrait';
-import { useSettingsStore } from './settings';
+import { useCustomPortraitsStore } from './customPortraits';
+import {
+  buildPortraitUrl,
+  isR18Portrait,
+  normalizePortraitState,
+  portraitFileStem,
+  SAFE_PORTRAIT_STATE,
+} from './portrait';
+import { DEFAULT_PORTRAIT_BASE, DEFAULT_PORTRAIT_EXT, useSettingsStore } from './settings';
 
 export function formatMoney(n: unknown): string {
   const num = Number(n) || 0;
@@ -52,36 +59,51 @@ export function isPresent(value: unknown): boolean {
 }
 
 /**
- * 立绘 URL：`{portraitBaseUrl}/{角色名}/{角色名-主类型-次类型-差分}.{ext}`
- * 未配置基址时返回 placehold（文案为期望文件名，便于对照资源）
+ * 立绘 URL 优先级：
+ * 1. 安全模式且为 R18 → 强制回退日常-普通-1
+ * 2. 本机自定义立绘（IndexedDB）
+ * 3. 官方 CDN `{base}/{角色名}/{stem}.png`
+ * 4. placehold 占位
  */
 export function resolvePortrait(
   name: string,
   portraitState: unknown,
   size: 'card' | 'full' = 'card',
-  options?: { baseUrl?: string; ext?: string },
 ): string {
-  let baseUrl = String(options?.baseUrl ?? '').trim();
-  let ext = String(options?.ext ?? '').trim();
-
-  // options 里若传了空串（历史 localStorage），仍回退到设置默认值
-  if (!baseUrl || !ext) {
-    try {
-      const store = useSettingsStore();
-      if (!baseUrl) baseUrl = String(store.settings.portraitBaseUrl || '');
-      if (!ext) ext = String(store.settings.portraitExt || 'png');
-    } catch {
-      /* pinia 未就绪 */
-    }
+  let safeMode = false;
+  try {
+    const settings = useSettingsStore();
+    safeMode = Boolean(settings.settings.safeMode);
+  } catch {
+    /* pinia 未就绪 */
   }
 
-  const real = buildPortraitUrl(name, portraitState, { baseUrl, ext: ext || 'png' });
+  let customUrls: Record<string, string> = {};
+  try {
+    const custom = useCustomPortraitsStore();
+    void custom.revision;
+    customUrls = custom.urls;
+  } catch {
+    /* pinia 未就绪 */
+  }
+
+  const originalR18 = isR18Portrait(portraitState);
+  const state =
+    safeMode && originalR18 ? SAFE_PORTRAIT_STATE : normalizePortraitState(portraitState);
+  const stem = portraitFileStem(name, state);
+
+  const custom = customUrls[stem];
+  if (custom) return custom;
+
+  const real = buildPortraitUrl(name, state, {
+    baseUrl: DEFAULT_PORTRAIT_BASE,
+    ext: DEFAULT_PORTRAIT_EXT,
+  });
   if (real) return real;
 
-  const state = normalizePortraitState(portraitState);
-  const stem = portraitFileStem(name, state);
   const dim = size === 'full' ? '420x700' : '300x500';
-  return `https://placehold.co/${dim}/FFD4C2/6B5548?text=${encodeURIComponent(stem)}`;
+  const label = safeMode && originalR18 ? '安全模式' : stem;
+  return `https://placehold.co/${dim}/FFD4C2/6B5548?text=${encodeURIComponent(label)}`;
 }
 
 export function asRecord(value: unknown): Record<string, any> {

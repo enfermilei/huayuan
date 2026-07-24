@@ -10,7 +10,7 @@
     </button>
     <button class="action-btn" type="button" @click="emit('open', 'settings')">
       <span class="btn-icon icon-settings"></span>
-      终端设置
+      设置
     </button>
   </div>
 </template>

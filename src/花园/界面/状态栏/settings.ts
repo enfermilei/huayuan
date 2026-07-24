@@ -1,20 +1,13 @@
 export const DEFAULT_PORTRAIT_BASE = 'https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@main/portraits';
+export const DEFAULT_PORTRAIT_EXT = 'png';
 
 const Settings = z
   .object({
     showThoughts: z.boolean().prefault(true),
     enableEnterAnim: z.boolean().prefault(true),
     rosterPreferPresent: z.boolean().prefault(true),
-    /** 立绘资源根目录；文件在 `{base}/{角色名}/{角色名}-主类型-次类型-差分.ext` */
-    portraitBaseUrl: z
-      .string()
-      .prefault(DEFAULT_PORTRAIT_BASE)
-      .transform(s => s.trim() || DEFAULT_PORTRAIT_BASE),
-    /** 立绘扩展名，不含点，默认 png */
-    portraitExt: z
-      .string()
-      .prefault('png')
-      .transform(s => s.trim().replace(/^\./, '') || 'png'),
+    /** 安全模式：隐藏性事/裸体等 R18 立绘，回退到日常-普通 */
+    safeMode: z.boolean().prefault(false),
   })
   .prefault({});
 

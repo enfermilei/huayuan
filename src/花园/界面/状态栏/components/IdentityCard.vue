@@ -10,14 +10,25 @@
             <img :src="detail.src" :alt="detail.name" @error="broken = true" />
             <div class="portrait-fallback">
               {{ detail.name }}
-              <span>立绘缺失</span>
+              <span>{{ settings.safeMode && detail.portraitR18 ? '安全模式已隐藏' : '立绘缺失' }}</span>
+              <button class="portrait-upload-btn" type="button" @click.stop="pickPortrait">上传立绘</button>
             </div>
             <div class="id-card-portrait-veil"></div>
             <div class="id-card-portrait-meta">
               <span class="id-card-portrait-tag">{{ detail.portraitMain }}</span>
               <span v-if="detail.present" class="id-card-portrait-tag present">在场</span>
               <span v-if="detail.pregnant" class="id-card-portrait-tag warn">怀孕</span>
+              <button class="id-card-portrait-tag upload" type="button" @click.stop="pickPortrait">
+                {{ broken ? '上传立绘' : '替换立绘' }}
+              </button>
             </div>
+            <input
+              ref="portraitFileInput"
+              class="portrait-file-hidden"
+              type="file"
+              accept="image/png,image/jpeg,image/webp,image/gif"
+              @change="onPortraitFile"
+            />
           </aside>
 
           <!-- 右侧信息 -->
@@ -171,6 +182,8 @@
 </template>
 
 <script setup lang="ts">
+import { useCustomPortraitsStore } from '../customPortraits';
+import { isR18Portrait } from '../portrait';
 import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
 import { asRecord, formatMoney, isPresent, resolvePortrait, toPercent } from '../utils';
@@ -189,10 +202,12 @@ const tabs: { id: TabId; label: string }[] = [
 
 const store = useDataStore();
 const { settings } = storeToRefs(useSettingsStore());
+const customPortraits = useCustomPortraitsStore();
 const activeTab = ref<TabId>('profile');
 const thoughtExpanded = ref(false);
 const hoverMeter = ref<'like' | 'loyal' | null>(null);
 const broken = ref(false);
+const portraitFileInput = ref<HTMLInputElement | null>(null);
 
 watch(
   () => props.memberName,
@@ -203,16 +218,23 @@ watch(
   },
 );
 
-const detail = computed(() => {
+const memberData = computed(() => {
   const roster = asRecord(_.get(store.data, '成员名册', {}));
-  const d = roster[props.memberName];
+  return roster[props.memberName] ?? null;
+});
+
+const currentPortraitState = computed(() => _.get(memberData.value, '立绘状态', {}));
+
+const detail = computed(() => {
+  void settings.value.safeMode;
+  const d = memberData.value;
   if (!d) return null;
 
   const like = Number(_.get(d, '好感度', 0)) || 0;
   const loyal = Number(_.get(d, '忠诚度', 0)) || 0;
   const body = asRecord(_.get(d, '身体状况', {}));
   const outfitObj = asRecord(_.get(d, '着装', {}));
-  const portrait = _.get(d, '立绘状态', {});
+  const portrait = currentPortraitState.value;
   const bag = Object.entries(asRecord(_.get(d, '背包物品', {})))
     .map(([name, item]) => {
       const cnt = Number(_.get(item, '数量', 0)) || 0;
@@ -240,10 +262,8 @@ const detail = computed(() => {
     thought: thoughtRaw,
     portraitMain: String(_.get(portrait, '主类型', '日常')),
     portraitSub: String(_.get(portrait, '次类型', '普通')),
-    src: resolvePortrait(props.memberName, portrait, 'full', {
-      baseUrl: settings.value.portraitBaseUrl,
-      ext: settings.value.portraitExt,
-    }),
+    portraitR18: isR18Portrait(portrait),
+    src: resolvePortrait(props.memberName, portrait, 'full'),
     body,
     outfit: (['上衣', '下装', '袜', '鞋', '配饰'] as const)
       .map(k => String(outfitObj[k] || ''))
@@ -263,6 +283,25 @@ watch(
     broken.value = false;
   },
 );
+
+function pickPortrait() {
+  portraitFileInput.value?.click();
+}
+
+async function onPortraitFile(ev: Event) {
+  const input = ev.target as HTMLInputElement;
+  const file = input.files?.[0];
+  input.value = '';
+  if (!file) return;
+  try {
+    const stem = await customPortraits.upsertFor(props.memberName, currentPortraitState.value, file);
+    broken.value = false;
+    toastr.success(`已替换立绘：${stem}`);
+  } catch (error) {
+    console.error('[花园状态栏] 身份卡上传立绘失败', error);
+    toastr.error('立绘上传失败');
+  }
+}
 
 function isBodyAlert(value: unknown): boolean {
   const s = String(value || '');

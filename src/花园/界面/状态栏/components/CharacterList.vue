@@ -82,8 +82,7 @@ type CharCard = {
 };
 
 const characters = computed(() => {
-  const baseUrl = settings.value.portraitBaseUrl;
-  const ext = settings.value.portraitExt;
+  void settings.value.safeMode;
   const roster = asRecord(_.get(store.data, '成员名册', {}));
   const list: CharCard[] = [];
 
@@ -103,7 +102,7 @@ const characters = computed(() => {
       loyalPct: toPercent(loyal),
       isDanger: loyal < 0,
       snippet,
-      src: resolvePortrait(name, _.get(d, '立绘状态', {}), 'card', { baseUrl, ext }),
+      src: resolvePortrait(name, _.get(d, '立绘状态', {}), 'card'),
     });
   });
 

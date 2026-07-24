@@ -2982,6 +2982,162 @@ body {
   width: 100%;
 }
 
+#garden-mvu-root .settings-portrait-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  background: var(--glass-bg-subtle);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+}
+
+#garden-mvu-root .settings-portrait-head .settings-hint {
+  margin-top: 4px;
+}
+
+#garden-mvu-root .portrait-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+#garden-mvu-root .portrait-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  opacity: 0.85;
+}
+
+#garden-mvu-root .portrait-field .settings-input {
+  margin-top: 0;
+}
+
+#garden-mvu-root .portrait-field-file {
+  grid-column: 1 / -1;
+}
+
+#garden-mvu-root .portrait-form-actions {
+  grid-column: 1 / -1;
+}
+
+#garden-mvu-root .portrait-form-actions .action-btn {
+  width: 100%;
+}
+
+#garden-mvu-root .portrait-form-hint {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 700;
+  opacity: 0.7;
+}
+
+#garden-mvu-root .portrait-form-hint.error {
+  color: #b42318;
+  opacity: 1;
+}
+
+#garden-mvu-root .portrait-stem-preview {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  opacity: 0.45;
+  word-break: break-all;
+}
+
+#garden-mvu-root .portrait-override-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+#garden-mvu-root .portrait-override-item {
+  display: grid;
+  grid-template-columns: 44px 1fr auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.45);
+  border: 1px solid rgba(107, 85, 72, 0.12);
+}
+
+#garden-mvu-root .portrait-override-item img {
+  width: 44px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.06);
+}
+
+#garden-mvu-root .portrait-override-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+#garden-mvu-root .portrait-override-meta strong {
+  font-size: 0.86rem;
+  color: var(--text-dark);
+}
+
+#garden-mvu-root .portrait-override-meta span {
+  font-size: 0.72rem;
+  opacity: 0.55;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#garden-mvu-root .portrait-override-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+#garden-mvu-root .portrait-override-actions .modal-close {
+  padding: 4px 8px;
+  font-size: 0.72rem;
+}
+
+#garden-mvu-root .portrait-empty {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  opacity: 0.45;
+  text-align: center;
+  padding: 8px 0;
+}
+
+#garden-mvu-root .portrait-file-hidden {
+  display: none;
+}
+
+#garden-mvu-root .portrait-upload-btn {
+  margin-top: 8px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.18);
+  color: inherit;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#garden-mvu-root .id-card-portrait-tag.upload {
+  cursor: pointer;
+  border-style: dashed;
+  font-family: inherit;
+  line-height: inherit;
+}
+
 #garden-mvu-root {
   position: relative;
 }
