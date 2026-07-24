@@ -40,9 +40,11 @@
           "type": "object",
           "properties": {
             "总资金": {
+              "default": 0,
               "type": "number"
             },
             "组织声望": {
+              "default": 0,
               "type": "number"
             },
             "近期事务": {
@@ -127,6 +129,7 @@
               "description": "赌场近期的运营情况描述"
             },
             "本周收益": {
+              "default": 0,
               "type": "number"
             }
           }
@@ -141,6 +144,7 @@
               "description": "酒馆及情报交易的运营情况"
             },
             "本周收益": {
+              "default": 0,
               "type": "number"
             }
           }
@@ -159,6 +163,7 @@
         "type": "object",
         "properties": {
           "年龄": {
+            "default": 0,
             "type": "number"
           },
           "职务": {
@@ -171,15 +176,19 @@
             "type": "string"
           },
           "贡献度": {
+            "default": 0,
             "type": "number"
           },
           "资金": {
+            "default": 0,
             "type": "number"
           },
           "好感度": {
+            "default": 0,
             "type": "number"
           },
           "忠诚度": {
+            "default": 0,
             "type": "number"
           },
           "短期目标": {
@@ -255,6 +264,7 @@
             }
           },
           "是否怀孕": {
+            "default": false,
             "type": "boolean"
           },
           "立绘状态": {
@@ -285,6 +295,7 @@
             }
           },
           "是否在场": {
+            "default": false,
             "type": "boolean"
           },
           "背包物品": {
@@ -324,9 +335,11 @@
           "type": "string"
         },
         "贡献度": {
+          "default": 0,
           "type": "number"
         },
         "资金": {
+          "default": 0,
           "type": "number"
         },
         "着装": {
