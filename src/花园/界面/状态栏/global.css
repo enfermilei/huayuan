@@ -215,12 +215,7 @@ body {
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
-  background: linear-gradient(
-    115deg,
-    transparent 38%,
-    rgba(255, 255, 255, 0.38) 50%,
-    transparent 62%
-  );
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.38) 50%, transparent 62%);
   background-size: 220% 100%;
   animation: gmvuPillSheen 7.5s ease-in-out infinite;
   animation-delay: calc(var(--pill-i, 0) * 0.55s);
@@ -244,9 +239,7 @@ body {
   animation:
     gmvuPillEnter 0.62s var(--ease-spring) both,
     gmvuThunderShake 0.58s ease-in-out infinite;
-  animation-delay:
-    calc(var(--pill-i, 0) * 0.07s),
-    0.7s;
+  animation-delay: calc(var(--pill-i, 0) * 0.07s), 0.7s;
 }
 
 #garden-mvu-root .pill-icon {

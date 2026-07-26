@@ -98,8 +98,7 @@ export function resolvePortrait(name: string, portraitState: unknown, size: 'car
   }
 
   const originalR18 = isR18Portrait(effectiveState);
-  const state =
-    safeMode && originalR18 ? SAFE_PORTRAIT_STATE : normalizePortraitState(effectiveState);
+  const state = safeMode && originalR18 ? SAFE_PORTRAIT_STATE : normalizePortraitState(effectiveState);
   const stem = portraitFileStem(name, state);
 
   const custom = customUrls[stem];

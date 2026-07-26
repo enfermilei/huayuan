@@ -43,9 +43,7 @@
           <div class="settings-portrait-head">
             <div>
               <span class="settings-label">立绘锁定</span>
-              <span class="settings-hint"
-                >锁定后无视变量更新，始终显示锁定时的立绘。可在成员身份卡上锁定/解锁。</span
-              >
+              <span class="settings-hint">锁定后无视变量更新，始终显示锁定时的立绘。可在成员身份卡上锁定/解锁。</span>
             </div>
           </div>
           <div v-if="lockList.length" class="portrait-lock-list">

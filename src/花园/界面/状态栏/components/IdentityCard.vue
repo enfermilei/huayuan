@@ -23,11 +23,7 @@
               <button class="id-card-portrait-tag upload" type="button" @click.stop="pickPortrait">
                 {{ broken ? '上传立绘' : '替换立绘' }}
               </button>
-              <button
-                class="id-card-portrait-tag lock"
-                type="button"
-                @click.stop="togglePortraitLock"
-              >
+              <button class="id-card-portrait-tag lock" type="button" @click.stop="togglePortraitLock">
                 {{ detail.portraitLocked ? '解锁立绘' : '锁定立绘' }}
               </button>
             </div>

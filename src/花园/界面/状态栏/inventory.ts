@@ -17,8 +17,7 @@ const CATEGORY_RULES: { cat: InvCategory; re: RegExp }[] = [
 ];
 
 export function parseInventory(raw: unknown): InvItem[] {
-  const bag =
-    typeof raw === 'object' && raw !== null && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {};
+  const bag = typeof raw === 'object' && raw !== null && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {};
 
   return Object.entries(bag)
     .map(([name, d]) => {

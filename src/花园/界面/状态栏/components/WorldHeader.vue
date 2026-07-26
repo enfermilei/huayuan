@@ -1,8 +1,5 @@
 <template>
-  <header
-    class="world-header"
-    :class="[mood, `period-${period}`, `weather-${weatherKind}`, { weekend: weekend }]"
-  >
+  <header class="world-header" :class="[mood, `period-${period}`, `weather-${weatherKind}`, { weekend: weekend }]">
     <div class="world-header-glow" aria-hidden="true"></div>
 
     <div class="world-info-pill pill-date" :class="{ weekend: weekend }" style="--pill-i: 0">

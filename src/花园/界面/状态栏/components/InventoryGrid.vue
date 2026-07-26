@@ -8,12 +8,7 @@
         <span v-if="summary.important" class="bag-summary-hot">· 重要 {{ summary.important }}</span>
       </div>
       <div v-if="!compact && categories.length > 1" class="bag-filters">
-        <button
-          type="button"
-          class="bag-filter"
-          :class="{ active: filter === '全部' }"
-          @click="filter = '全部'"
-        >
+        <button type="button" class="bag-filter" :class="{ active: filter === '全部' }" @click="filter = '全部'">
           全部
         </button>
         <button

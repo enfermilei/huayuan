@@ -12,18 +12,22 @@ const LocksSchema = z.record(z.string(), LockEntry).prefault({});
 export type PortraitLockEntry = z.infer<typeof LockEntry>;
 
 export const usePortraitLocksStore = defineStore('garden-portrait-locks', () => {
-  const locks = useLocalStorage<Record<string, PortraitLockEntry>>('garden-mvu:portrait-locks', {}, {
-    serializer: {
-      read: raw => {
-        try {
-          return LocksSchema.parse(JSON.parse(raw));
-        } catch {
-          return {};
-        }
+  const locks = useLocalStorage<Record<string, PortraitLockEntry>>(
+    'garden-mvu:portrait-locks',
+    {},
+    {
+      serializer: {
+        read: raw => {
+          try {
+            return LocksSchema.parse(JSON.parse(raw));
+          } catch {
+            return {};
+          }
+        },
+        write: value => JSON.stringify(LocksSchema.parse(value)),
       },
-      write: value => JSON.stringify(LocksSchema.parse(value)),
     },
-  });
+  );
 
   locks.value = LocksSchema.parse(locks.value);
 
