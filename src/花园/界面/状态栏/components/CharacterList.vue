@@ -1,17 +1,17 @@
 <template>
   <section class="panel character-list-wrapper">
     <h3 class="panel-title" style="padding: 0 6px">在场成员</h3>
-    <div class="character-list">
+    <div ref="listEl" class="character-list" :class="{ 'is-dragging': dragging }">
       <article
         v-for="(char, index) in characters"
         :key="char.name"
         class="character-card"
         :class="{ 'fade-in-up': settings.enableEnterAnim, 'danger-glow': char.isDanger }"
         :style="settings.enableEnterAnim ? { animationDelay: `${(0.05 + index * 0.07).toFixed(2)}s` } : undefined"
-        @click="emit('select', char.name)"
+        @pointerdown="onCardPointerDown(char.name, $event)"
       >
         <div class="portrait-area" :class="{ 'is-broken': brokenPortraits.has(char.name) }">
-          <img :src="char.src" :alt="char.name" @error="brokenPortraits.add(char.name)" />
+          <img :src="char.src" :alt="char.name" draggable="false" @error="brokenPortraits.add(char.name)" />
           <div class="portrait-fallback">
             {{ char.name }}
             <span style="font-size: 0.7rem; opacity: 0.6">立绘缺失</span>
@@ -33,7 +33,10 @@
               <span class="num font-mono">{{ char.like }}</span>
             </div>
             <div class="progress-bar">
-              <div class="fill pink animate-in" :style="{ '--target-width': `${char.likePct}%` }"></div>
+              <div
+                class="fill pink animate-in"
+                :style="{ width: `${char.likePct}%`, '--target-width': `${char.likePct}%` }"
+              ></div>
             </div>
           </div>
           <div class="progress-with-label">
@@ -45,7 +48,7 @@
               <div
                 class="fill animate-in"
                 :class="char.isDanger ? 'danger' : 'gold'"
-                :style="{ '--target-width': `${char.loyalPct}%` }"
+                :style="{ width: `${char.loyalPct}%`, '--target-width': `${char.loyalPct}%` }"
               ></div>
             </div>
           </div>
@@ -68,6 +71,20 @@ const emit = defineEmits<{ select: [name: string] }>();
 const store = useDataStore();
 const { settings } = storeToRefs(useSettingsStore());
 const brokenPortraits = reactive(new Set<string>());
+const listEl = ref<HTMLElement | null>(null);
+const dragging = ref(false);
+
+const DRAG_THRESHOLD = 12;
+
+type Gesture = {
+  pointerId: number;
+  name: string;
+  startX: number;
+  startScrollLeft: number;
+  moved: boolean;
+};
+
+let gesture: Gesture | null = null;
 
 type CharCard = {
   name: string;
@@ -113,4 +130,85 @@ watch(
   () => characters.value.map(c => c.src).join('|'),
   () => brokenPortraits.clear(),
 );
+
+onMounted(() => {
+  listEl.value?.addEventListener('wheel', onWheel as EventListener, { passive: false });
+});
+
+onBeforeUnmount(() => {
+  listEl.value?.removeEventListener('wheel', onWheel as EventListener);
+  endGesture(false);
+});
+
+function detachListeners() {
+  window.removeEventListener('pointermove', onPointerMove, true);
+  window.removeEventListener('pointerup', onPointerUp, true);
+  window.removeEventListener('pointercancel', onPointerCancel, true);
+}
+
+function endGesture(open: boolean) {
+  const g = gesture;
+  gesture = null;
+  dragging.value = false;
+  detachListeners();
+  if (open && g && !g.moved) {
+    emit('select', g.name);
+  }
+}
+
+function onCardPointerDown(name: string, ev: PointerEvent) {
+  if (ev.button !== 0 || !listEl.value) return;
+
+  // 若上次手势残留，先清掉
+  endGesture(false);
+
+  gesture = {
+    pointerId: ev.pointerId,
+    name,
+    startX: ev.clientX,
+    startScrollLeft: listEl.value.scrollLeft,
+    moved: false,
+  };
+
+  // 用捕获阶段挂在 window，松手在卡片外也能收到
+  window.addEventListener('pointermove', onPointerMove, true);
+  window.addEventListener('pointerup', onPointerUp, true);
+  window.addEventListener('pointercancel', onPointerCancel, true);
+}
+
+function onPointerMove(ev: PointerEvent) {
+  const g = gesture;
+  if (!g || ev.pointerId !== g.pointerId || !listEl.value) return;
+
+  const dx = ev.clientX - g.startX;
+  if (!g.moved && Math.abs(dx) > DRAG_THRESHOLD) {
+    g.moved = true;
+    dragging.value = true;
+  }
+  if (!g.moved) return;
+
+  listEl.value.scrollLeft = g.startScrollLeft - dx;
+  ev.preventDefault();
+}
+
+function onPointerUp(ev: PointerEvent) {
+  const g = gesture;
+  if (!g || ev.pointerId !== g.pointerId) return;
+  endGesture(true);
+}
+
+function onPointerCancel(ev: PointerEvent) {
+  const g = gesture;
+  if (!g || ev.pointerId !== g.pointerId) return;
+  endGesture(false);
+}
+
+function onWheel(ev: WheelEvent) {
+  const el = listEl.value;
+  if (!el) return;
+  if (Math.abs(ev.deltaY) >= Math.abs(ev.deltaX) && ev.deltaY !== 0) {
+    ev.preventDefault();
+    el.scrollLeft += ev.deltaY;
+  }
+}
 </script>

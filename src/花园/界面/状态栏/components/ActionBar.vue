@@ -8,6 +8,10 @@
       <span class="btn-icon icon-map"></span>
       组织地图
     </button>
+    <button class="action-btn" type="button" @click="emit('open', 'bag')">
+      <span class="btn-icon icon-bag"></span>
+      背包
+    </button>
     <button class="action-btn" type="button" @click="emit('open', 'settings')">
       <span class="btn-icon icon-settings"></span>
       设置
@@ -16,7 +20,7 @@
 </template>
 
 <script setup lang="ts">
-export type GardenPanel = 'roster' | 'map' | 'settings';
+export type GardenPanel = 'roster' | 'map' | 'bag' | 'settings';
 
 const emit = defineEmits<{ open: [panel: GardenPanel] }>();
 </script>

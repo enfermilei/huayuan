@@ -22,6 +22,7 @@
     />
     <RosterPanel v-if="panel === 'roster'" :focus-name="focusName" @close="closePanel" />
     <MapPanel v-if="panel === 'map'" @close="closePanel" @open-identity="openIdentity" @open-roster="openRoster" />
+    <InventoryPanel v-if="panel === 'bag'" @close="closePanel" />
     <SettingsPanel v-if="panel === 'settings'" @close="closePanel" />
   </div>
 </template>
@@ -30,6 +31,7 @@
 import ActionBar, { type GardenPanel } from './components/ActionBar.vue';
 import CharacterList from './components/CharacterList.vue';
 import IdentityCard from './components/IdentityCard.vue';
+import InventoryPanel from './components/InventoryPanel.vue';
 import MapPanel from './components/MapPanel.vue';
 import OrgPanel from './components/OrgPanel.vue';
 import RosterPanel from './components/RosterPanel.vue';

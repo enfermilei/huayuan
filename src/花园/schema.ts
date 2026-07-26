@@ -4,6 +4,8 @@ export const Schema = z.object({
       日期: z.string().prefault('第1天'),
       时间: z.string().prefault('8:00'),
       星期: z.enum(['周一', '周二', '周三', '周四', '周五', '周六', '周日']).prefault('周一'),
+      /** 可选；状态栏优先用此文案推断日间/傍晚/夜晚/深夜氛围 */
+      时段: z.string().prefault(''),
       天气: z.string().prefault('晴天'),
       温度: z.string().prefault('21°'),
       组织全局: z

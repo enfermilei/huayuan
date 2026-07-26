@@ -6,6 +6,7 @@ import {
   portraitFileStem,
   SAFE_PORTRAIT_STATE,
 } from './portrait';
+import { usePortraitLocksStore } from './portraitLocks';
 import { DEFAULT_PORTRAIT_BASE, DEFAULT_PORTRAIT_EXT, useSettingsStore } from './settings';
 
 export function formatMoney(n: unknown): string {
@@ -13,8 +14,9 @@ export function formatMoney(n: unknown): string {
   return `￥${num.toLocaleString('en-US')}`;
 }
 
+/** 好感/忠诚数值为 -100~100；进度条按 0~100 展示（与数字观感一致，负值用绝对值） */
 export function toPercent(v: unknown): number {
-  return _.clamp((Number(v) || 0) + 100, 0, 200) / 2;
+  return _.clamp(Math.abs(Number(v) || 0), 0, 100);
 }
 
 export function statusDotClass(statusStr: unknown): '' | 'warn' | 'danger' {
@@ -34,6 +36,7 @@ export function tempClass(tempStr: unknown): 'text-temp-hot' | 'text-temp-cold' 
 
 export function timeIconClass(timeStr: unknown): 't-day' | 't-evening' | 't-night' {
   const s = String(timeStr || '');
+  if (/深夜|凌晨/.test(s)) return 't-night';
   const matched = s.match(/(\d{1,2})\s*[:：]/);
   const h = matched ? parseInt(matched[1], 10) : NaN;
   if (!isNaN(h)) {
@@ -60,10 +63,11 @@ export function isPresent(value: unknown): boolean {
 
 /**
  * 立绘 URL 优先级：
- * 1. 安全模式且为 R18 → 强制回退日常-普通-1
- * 2. 本机自定义立绘（IndexedDB）
- * 3. 官方 CDN `{base}/{角色名}/{stem}.png`
- * 4. placehold 占位
+ * 1. 本机锁定立绘（忽略 MVU 当前立绘状态）
+ * 2. 安全模式且为 R18 → 强制回退日常-普通-1
+ * 3. 本机自定义立绘（IndexedDB）
+ * 4. 官方 CDN `{base}/{角色名}/{stem}.png`
+ * 5. placehold 占位
  */
 export function resolvePortrait(
   name: string,
@@ -78,6 +82,16 @@ export function resolvePortrait(
     /* pinia 未就绪 */
   }
 
+  let effectiveState = portraitState;
+  try {
+    const locks = usePortraitLocksStore();
+    void locks.revision;
+    const locked = locks.getLock(name);
+    if (locked) effectiveState = locked;
+  } catch {
+    /* pinia 未就绪 */
+  }
+
   let customUrls: Record<string, string> = {};
   try {
     const custom = useCustomPortraitsStore();
@@ -87,9 +101,9 @@ export function resolvePortrait(
     /* pinia 未就绪 */
   }
 
-  const originalR18 = isR18Portrait(portraitState);
+  const originalR18 = isR18Portrait(effectiveState);
   const state =
-    safeMode && originalR18 ? SAFE_PORTRAIT_STATE : normalizePortraitState(portraitState);
+    safeMode && originalR18 ? SAFE_PORTRAIT_STATE : normalizePortraitState(effectiveState);
   const stem = portraitFileStem(name, state);
 
   const custom = customUrls[stem];

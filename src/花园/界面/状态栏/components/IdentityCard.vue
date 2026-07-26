@@ -16,10 +16,19 @@
             <div class="id-card-portrait-veil"></div>
             <div class="id-card-portrait-meta">
               <span class="id-card-portrait-tag">{{ detail.portraitMain }}</span>
+              <span class="id-card-portrait-tag">{{ detail.portraitSub }}</span>
+              <span v-if="detail.portraitLocked" class="id-card-portrait-tag locked">已锁定</span>
               <span v-if="detail.present" class="id-card-portrait-tag present">在场</span>
               <span v-if="detail.pregnant" class="id-card-portrait-tag warn">怀孕</span>
               <button class="id-card-portrait-tag upload" type="button" @click.stop="pickPortrait">
                 {{ broken ? '上传立绘' : '替换立绘' }}
+              </button>
+              <button
+                class="id-card-portrait-tag lock"
+                type="button"
+                @click.stop="togglePortraitLock"
+              >
+                {{ detail.portraitLocked ? '解锁立绘' : '锁定立绘' }}
               </button>
             </div>
             <input
@@ -148,17 +157,8 @@
                   </div>
                 </div>
                 <div class="id-section">
-                  <div class="sub-section-title">背包物品</div>
-                  <div class="inventory-grid id-inv-grid">
-                    <div v-for="item in detail.bag" :key="item.name" class="inv-item">
-                      <span class="inv-name">{{ item.name }}</span>
-                      <span class="inv-desc">{{ item.desc }}</span>
-                      <span class="inv-badge">{{ item.badge }}</span>
-                    </div>
-                    <div v-if="detail.bag.length === 0" class="inv-desc" style="opacity: 0.5; padding: 10px">
-                      背包空空如也
-                    </div>
-                  </div>
+                  <div class="sub-section-title">背包</div>
+                  <InventoryGrid :items="detail.bag" compact empty-text="背包空空如也" />
                 </div>
               </template>
             </div>
@@ -183,10 +183,13 @@
 
 <script setup lang="ts">
 import { useCustomPortraitsStore } from '../customPortraits';
-import { isR18Portrait } from '../portrait';
+import { parseInventory } from '../inventory';
+import { isR18Portrait, normalizePortraitState } from '../portrait';
+import { usePortraitLocksStore } from '../portraitLocks';
 import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
 import { asRecord, formatMoney, isPresent, resolvePortrait, toPercent } from '../utils';
+import InventoryGrid from './InventoryGrid.vue';
 
 const props = defineProps<{ memberName: string }>();
 const emit = defineEmits<{ close: []; openRoster: [name: string] }>();
@@ -203,6 +206,7 @@ const tabs: { id: TabId; label: string }[] = [
 const store = useDataStore();
 const { settings } = storeToRefs(useSettingsStore());
 const customPortraits = useCustomPortraitsStore();
+const portraitLocks = usePortraitLocksStore();
 const activeTab = ref<TabId>('profile');
 const thoughtExpanded = ref(false);
 const hoverMeter = ref<'like' | 'loyal' | null>(null);
@@ -225,8 +229,15 @@ const memberData = computed(() => {
 
 const currentPortraitState = computed(() => _.get(memberData.value, '立绘状态', {}));
 
+/** 实际用于展示/替换的立绘状态：有锁定则用锁定值 */
+const displayPortraitState = computed(() => {
+  void portraitLocks.revision;
+  return portraitLocks.getLock(props.memberName) ?? normalizePortraitState(currentPortraitState.value);
+});
+
 const detail = computed(() => {
   void settings.value.safeMode;
+  void portraitLocks.revision;
   const d = memberData.value;
   if (!d) return null;
 
@@ -235,14 +246,9 @@ const detail = computed(() => {
   const body = asRecord(_.get(d, '身体状况', {}));
   const outfitObj = asRecord(_.get(d, '着装', {}));
   const portrait = currentPortraitState.value;
-  const bag = Object.entries(asRecord(_.get(d, '背包物品', {})))
-    .map(([name, item]) => {
-      const cnt = Number(_.get(item, '数量', 0)) || 0;
-      if (cnt <= 0) return null;
-      return { name, desc: String(_.get(item, '描述', '无描述')), badge: cnt > 99 ? '99+' : String(cnt) };
-    })
-    .filter((x): x is NonNullable<typeof x> => x !== null);
-
+  const display = displayPortraitState.value;
+  const locked = portraitLocks.isLocked(props.memberName);
+  const bag = parseInventory(_.get(d, '背包物品', {}));
   const thoughtRaw = String(_.get(d, '内心想法', '无') || '无');
 
   return {
@@ -260,9 +266,10 @@ const detail = computed(() => {
     contrib: (Number(_.get(d, '贡献度', 0)) || 0).toLocaleString('en-US'),
     fund: formatMoney(_.get(d, '资金', 0)),
     thought: thoughtRaw,
-    portraitMain: String(_.get(portrait, '主类型', '日常')),
-    portraitSub: String(_.get(portrait, '次类型', '普通')),
-    portraitR18: isR18Portrait(portrait),
+    portraitMain: display.主类型,
+    portraitSub: display.次类型,
+    portraitR18: isR18Portrait(display),
+    portraitLocked: locked,
     src: resolvePortrait(props.memberName, portrait, 'full'),
     body,
     outfit: (['上衣', '下装', '袜', '鞋', '配饰'] as const)
@@ -288,13 +295,31 @@ function pickPortrait() {
   portraitFileInput.value?.click();
 }
 
+function togglePortraitLock() {
+  try {
+    if (portraitLocks.isLocked(props.memberName)) {
+      portraitLocks.unlock(props.memberName);
+      toastr.info(`已解锁「${props.memberName}」立绘`);
+      return;
+    }
+    // 锁定当前正在显示的立绘（含已锁定时则刷新为当前 MVU；未锁定则锁 MVU 当前态）
+    portraitLocks.lock(props.memberName, currentPortraitState.value);
+    const state = normalizePortraitState(currentPortraitState.value);
+    toastr.success(`已锁定「${props.memberName}」立绘：${state.主类型}-${state.次类型}-${state.差分序号}`);
+  } catch (error) {
+    console.error('[花园状态栏] 锁定立绘失败', error);
+    toastr.error('锁定立绘失败');
+  }
+}
+
 async function onPortraitFile(ev: Event) {
   const input = ev.target as HTMLInputElement;
   const file = input.files?.[0];
   input.value = '';
   if (!file) return;
   try {
-    const stem = await customPortraits.upsertFor(props.memberName, currentPortraitState.value, file);
+    // 替换针对当前展示用的状态（锁定时改锁定那张）
+    const stem = await customPortraits.upsertFor(props.memberName, displayPortraitState.value, file);
     broken.value = false;
     toastr.success(`已替换立绘：${stem}`);
   } catch (error) {

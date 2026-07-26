@@ -42,6 +42,28 @@
         <section class="settings-portrait-section">
           <div class="settings-portrait-head">
             <div>
+              <span class="settings-label">立绘锁定</span>
+              <span class="settings-hint"
+                >锁定后无视变量更新，始终显示锁定时的立绘。可在成员身份卡上锁定/解锁。</span
+              >
+            </div>
+          </div>
+          <div v-if="lockList.length" class="portrait-lock-list">
+            <article v-for="item in lockList" :key="item.name" class="portrait-lock-item">
+              <div class="portrait-lock-meta">
+                <strong>{{ item.name }}</strong>
+                <span>{{ item.state.主类型 }}-{{ item.state.次类型 }}-{{ item.state.差分序号 }}</span>
+              </div>
+              <button class="modal-close" type="button" @click="unlockPortrait(item.name)">解锁</button>
+            </article>
+            <button class="action-btn" type="button" @click="clearLocks">清除全部锁定</button>
+          </div>
+          <p v-else class="portrait-empty">当前没有锁定的立绘</p>
+        </section>
+
+        <section class="settings-portrait-section">
+          <div class="settings-portrait-head">
+            <div>
               <span class="settings-label">自定义立绘</span>
               <span class="settings-hint"
                 >本机保存，优先于官方图。新角色缺图、或想替换现有立绘时在此添加。建议
@@ -134,6 +156,7 @@
 <script setup lang="ts">
 import { useCustomPortraitsStore } from '../customPortraits';
 import { PORTRAIT_MAINS, PORTRAIT_SUBS, PORTRAIT_SUB_FALLBACK, type PortraitMain } from '../portrait';
+import { usePortraitLocksStore } from '../portraitLocks';
 import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
 import { asRecord } from '../utils';
@@ -146,6 +169,8 @@ const { reset } = store;
 const dataStore = useDataStore();
 const customStore = useCustomPortraitsStore();
 const { urls: customUrls, list: customList } = storeToRefs(customStore);
+const portraitLocks = usePortraitLocksStore();
+const { list: lockList } = storeToRefs(portraitLocks);
 
 const fileInput = ref<HTMLInputElement | null>(null);
 const saving = ref(false);
@@ -259,5 +284,15 @@ async function removeItem(stem: string) {
     console.error('[花园状态栏] 删除自定义立绘失败', error);
     toastr.error('删除失败');
   }
+}
+
+function unlockPortrait(name: string) {
+  portraitLocks.unlock(name);
+  toastr.info(`已解锁「${name}」立绘`);
+}
+
+function clearLocks() {
+  portraitLocks.clearAll();
+  toastr.info('已清除全部立绘锁定');
 }
 </script>

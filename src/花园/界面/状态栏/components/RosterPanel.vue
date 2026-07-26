@@ -119,14 +119,7 @@
 
           <div class="detail-block">
             <div class="sub-section-title">背包</div>
-            <div class="inventory-grid">
-              <div v-for="item in detail.bag" :key="item.name" class="inv-item">
-                <span class="inv-name">{{ item.name }}</span>
-                <span class="inv-desc">{{ item.desc }}</span>
-                <span class="inv-badge">{{ item.badge }}</span>
-              </div>
-              <div v-if="detail.bag.length === 0" class="inv-desc" style="opacity: 0.5; padding: 10px">空</div>
-            </div>
+            <InventoryGrid :items="detail.bag" compact empty-text="空" />
           </div>
         </section>
         <section v-else class="roster-detail roster-empty-detail">选择左侧成员查看详情</section>
@@ -136,9 +129,11 @@
 </template>
 
 <script setup lang="ts">
+import { parseInventory } from '../inventory';
 import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
 import { asRecord, formatMoney, isPresent, resolvePortrait, toPercent } from '../utils';
+import InventoryGrid from './InventoryGrid.vue';
 
 const props = defineProps<{ focusName?: string | null }>();
 const emit = defineEmits<{ close: [] }>();
@@ -199,13 +194,7 @@ const detail = computed(() => {
   const loyal = Number(_.get(d, '忠诚度', 0)) || 0;
   const body = asRecord(_.get(d, '身体状况', {}));
   const outfitObj = asRecord(_.get(d, '着装', {}));
-  const bag = Object.entries(asRecord(_.get(d, '背包物品', {})))
-    .map(([name, item]) => {
-      const cnt = Number(_.get(item, '数量', 0)) || 0;
-      if (cnt <= 0) return null;
-      return { name, desc: String(_.get(item, '描述', '无描述')), badge: cnt > 99 ? '99+' : String(cnt) };
-    })
-    .filter((x): x is NonNullable<typeof x> => x !== null);
+  const bag = parseInventory(_.get(d, '背包物品', {}));
 
   return {
     name: m.name,
