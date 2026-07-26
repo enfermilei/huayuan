@@ -69,11 +69,7 @@ export function isPresent(value: unknown): boolean {
  * 4. 官方 CDN `{base}/{角色名}/{stem}.png`
  * 5. placehold 占位
  */
-export function resolvePortrait(
-  name: string,
-  portraitState: unknown,
-  size: 'card' | 'full' = 'card',
-): string {
+export function resolvePortrait(name: string, portraitState: unknown, size: 'card' | 'full' = 'card'): string {
   let safeMode = false;
   try {
     const settings = useSettingsStore();
