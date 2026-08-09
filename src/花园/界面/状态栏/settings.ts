@@ -33,17 +33,13 @@ const Settings = z
 
 export type GardenUiSettings = z.infer<typeof Settings>;
 
-export function resolveThemeCssVars(
-  settings: Pick<GardenUiSettings, 'themePreset' | 'themeAccent' | 'themeDark'>,
-) {
+export function resolveThemeCssVars(settings: Pick<GardenUiSettings, 'themePreset' | 'themeAccent' | 'themeDark'>) {
   return themeTokensToCssVars(
     resolveThemeTokens(settings.themePreset as ThemePresetId, settings.themeAccent, settings.themeDark),
   );
 }
 
-export function resolveThemeMode(
-  settings: Pick<GardenUiSettings, 'themePreset' | 'themeDark'>,
-) {
+export function resolveThemeMode(settings: Pick<GardenUiSettings, 'themePreset' | 'themeDark'>) {
   return presetMode(settings.themePreset as ThemePresetId, settings.themeDark);
 }
 

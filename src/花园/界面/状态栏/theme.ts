@@ -500,11 +500,7 @@ export function deriveThemeFromAccent(accentHex: string, dark = false): ThemeTok
   };
 }
 
-export function resolveThemeTokens(
-  preset: ThemePresetId,
-  customAccent: string,
-  customDark = false,
-): ThemeTokens {
+export function resolveThemeTokens(preset: ThemePresetId, customAccent: string, customDark = false): ThemeTokens {
   if (preset === 'custom') return deriveThemeFromAccent(customAccent, customDark);
   return PRESET_MAP[preset]?.tokens ?? peachTokens;
 }
