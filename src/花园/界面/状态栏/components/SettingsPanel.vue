@@ -42,6 +42,108 @@
         <section class="settings-portrait-section">
           <div class="settings-portrait-head">
             <div>
+              <span class="settings-label">主题颜色</span>
+              <span class="settings-hint">亮色 / 暗色氛围；本机保存，恢复默认会一并重置</span>
+            </div>
+          </div>
+
+          <p class="theme-group-label">亮色</p>
+          <div class="theme-preset-grid" role="listbox" aria-label="亮色主题">
+            <button
+              v-for="preset in LIGHT_THEME_PRESETS"
+              :key="preset.id"
+              type="button"
+              class="theme-swatch"
+              role="option"
+              :aria-selected="settings.themePreset === preset.id"
+              :class="{ active: settings.themePreset === preset.id }"
+              :title="preset.label"
+              @click="pickPreset(preset.id)"
+            >
+              <span
+                class="theme-swatch-chip"
+                :style="{
+                  background: `linear-gradient(135deg, ${preset.tokens.bg}, ${preset.tokens.accentDeep})`,
+                }"
+              />
+              <span class="theme-swatch-label">{{ preset.label }}</span>
+            </button>
+          </div>
+
+          <p class="theme-group-label">暗色</p>
+          <div class="theme-preset-grid" role="listbox" aria-label="暗色主题">
+            <button
+              v-for="preset in DARK_THEME_PRESETS"
+              :key="preset.id"
+              type="button"
+              class="theme-swatch theme-swatch-dark"
+              role="option"
+              :aria-selected="settings.themePreset === preset.id"
+              :class="{ active: settings.themePreset === preset.id }"
+              :title="preset.label"
+              @click="pickPreset(preset.id)"
+            >
+              <span
+                class="theme-swatch-chip"
+                :style="{
+                  background: `linear-gradient(135deg, ${preset.tokens.bg}, ${preset.tokens.accentDeep})`,
+                }"
+              />
+              <span class="theme-swatch-label">{{ preset.label }}</span>
+            </button>
+          </div>
+
+          <p class="theme-group-label">自定义</p>
+          <div class="theme-preset-grid theme-preset-grid-custom">
+            <button
+              type="button"
+              class="theme-swatch"
+              role="option"
+              :aria-selected="settings.themePreset === 'custom'"
+              :class="{ active: settings.themePreset === 'custom', 'theme-swatch-dark': settings.themeDark }"
+              title="自定义"
+              @click="enableCustomTheme"
+            >
+              <span
+                class="theme-swatch-chip theme-swatch-chip-custom"
+                :style="{
+                  background: `linear-gradient(135deg, ${customPreview.bg}, ${customPreview.accentDeep})`,
+                }"
+              />
+              <span class="theme-swatch-label">自定义</span>
+            </button>
+          </div>
+
+          <div v-if="settings.themePreset === 'custom'" class="theme-custom-block">
+            <label class="theme-custom-row">
+              <span class="theme-custom-label">主色</span>
+              <input
+                class="theme-color-input"
+                type="color"
+                :value="settings.themeAccent"
+                @input="onAccentInput"
+              />
+              <input
+                class="settings-input theme-hex-input"
+                type="text"
+                maxlength="7"
+                :value="settings.themeAccent"
+                @change="onAccentText"
+              />
+            </label>
+            <label class="settings-row theme-dark-toggle">
+              <span>
+                <span class="settings-label">自定义暗色底</span>
+                <span class="settings-hint">开启后按主色推导深色背景与面板</span>
+              </span>
+              <input v-model="settings.themeDark" type="checkbox" @change="onCustomDarkChange" />
+            </label>
+          </div>
+        </section>
+
+        <section class="settings-portrait-section">
+          <div class="settings-portrait-head">
+            <div>
               <span class="settings-label">立绘锁定</span>
               <span class="settings-hint">锁定后无视变量更新，始终显示锁定时的立绘。可在成员身份卡上锁定/解锁。</span>
             </div>
@@ -156,12 +258,47 @@ import { PORTRAIT_MAINS, PORTRAIT_SUBS, PORTRAIT_SUB_FALLBACK, type PortraitMain
 import { usePortraitLocksStore } from '../portraitLocks';
 import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
+import {
+  DARK_THEME_PRESETS,
+  LIGHT_THEME_PRESETS,
+  deriveThemeFromAccent,
+  presetAccent,
+  type ThemePresetId,
+} from '../theme';
 import { asRecord } from '../utils';
 
 const emit = defineEmits<{ close: [] }>();
 const store = useSettingsStore();
 const { settings } = storeToRefs(store);
-const { reset } = store;
+const { reset, setThemePreset, setThemeAccent, setThemeDark } = store;
+
+const customPreview = computed(() =>
+  deriveThemeFromAccent(settings.value.themeAccent, settings.value.themeDark),
+);
+
+function pickPreset(id: Exclude<ThemePresetId, 'custom'>) {
+  settings.value.themeAccent = presetAccent(id);
+  setThemePreset(id);
+}
+
+function enableCustomTheme() {
+  setThemePreset('custom');
+}
+
+function onAccentInput(ev: Event) {
+  const value = (ev.target as HTMLInputElement).value;
+  setThemeAccent(value);
+}
+
+function onAccentText(ev: Event) {
+  const raw = (ev.target as HTMLInputElement).value.trim();
+  const hex = raw.startsWith('#') ? raw : `#${raw}`;
+  setThemeAccent(hex);
+}
+
+function onCustomDarkChange() {
+  setThemeDark(Boolean(settings.value.themeDark));
+}
 
 const dataStore = useDataStore();
 const customStore = useCustomPortraitsStore();

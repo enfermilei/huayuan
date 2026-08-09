@@ -1,5 +1,5 @@
 <template>
-  <div id="garden-mvu-root">
+  <div id="garden-mvu-root" :style="themeCssVars" :data-theme-mode="themeMode">
     <div class="mvu-status-bar">
       <WorldHeader />
       <div class="main-grid">
@@ -38,11 +38,26 @@ import RosterPanel from './components/RosterPanel.vue';
 import SettingsPanel from './components/SettingsPanel.vue';
 import UserPanel from './components/UserPanel.vue';
 import WorldHeader from './components/WorldHeader.vue';
+import { resolveThemeCssVars, resolveThemeMode, useSettingsStore } from './settings';
 import { useDataStore } from './store';
 
 type OverlayPanel = GardenPanel | 'identity';
 
 useDataStore();
+const { settings } = storeToRefs(useSettingsStore());
+const themeCssVars = computed(() =>
+  resolveThemeCssVars({
+    themePreset: settings.value.themePreset,
+    themeAccent: settings.value.themeAccent,
+    themeDark: settings.value.themeDark,
+  }),
+);
+const themeMode = computed(() =>
+  resolveThemeMode({
+    themePreset: settings.value.themePreset,
+    themeDark: settings.value.themeDark,
+  }),
+);
 
 const panel = ref<OverlayPanel | null>(null);
 const focusName = ref<string | null>(null);
