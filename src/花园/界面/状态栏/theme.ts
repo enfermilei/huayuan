@@ -83,23 +83,24 @@ const lightSurface = {
 
 const darkSurface = {
   mode: 'dark' as const,
-  textPrimary: '#f2ebe3',
-  textDark: '#f7f1ea',
-  textSecondary: '#c9b8a8',
-  textLabel: 'rgba(242, 235, 227, 0.48)',
-  glassBg: 'rgba(255, 255, 255, 0.08)',
-  glassBgStrong: 'rgba(255, 255, 255, 0.13)',
-  glassBgSubtle: 'rgba(255, 255, 255, 0.05)',
-  glassEdgeTop: 'rgba(255, 255, 255, 0.2)',
-  glassEdgeLeft: 'rgba(255, 255, 255, 0.14)',
-  glassEdgeBottom: 'rgba(0, 0, 0, 0.35)',
-  glassEdgeRight: 'rgba(0, 0, 0, 0.25)',
-  progressTrack: 'rgba(255, 255, 255, 0.14)',
-  modalBg: 'rgba(28, 26, 32, 0.94)',
-  overlayBg: 'rgba(8, 8, 12, 0.55)',
-  panelSolid: 'rgba(36, 34, 42, 0.88)',
-  highlightInset: 'rgba(255, 255, 255, 0.12)',
-  highlightInsetStrong: 'rgba(255, 255, 255, 0.2)',
+  /* 暗色正文偏暖灰，避免刺眼近白；冷色预设会覆盖为冷灰 */
+  textPrimary: '#d8cfc4',
+  textDark: '#e4dbd0',
+  textSecondary: '#b4a394',
+  textLabel: 'rgba(216, 207, 196, 0.58)',
+  glassBg: 'rgba(255, 255, 255, 0.07)',
+  glassBgStrong: 'rgba(255, 255, 255, 0.11)',
+  glassBgSubtle: 'rgba(255, 255, 255, 0.045)',
+  glassEdgeTop: 'rgba(255, 255, 255, 0.16)',
+  glassEdgeLeft: 'rgba(255, 255, 255, 0.12)',
+  glassEdgeBottom: 'rgba(0, 0, 0, 0.4)',
+  glassEdgeRight: 'rgba(0, 0, 0, 0.28)',
+  progressTrack: 'rgba(255, 255, 255, 0.12)',
+  modalBg: 'rgba(24, 22, 28, 0.96)',
+  overlayBg: 'rgba(6, 6, 10, 0.58)',
+  panelSolid: 'rgba(32, 30, 36, 0.9)',
+  highlightInset: 'rgba(255, 255, 255, 0.1)',
+  highlightInsetStrong: 'rgba(255, 255, 255, 0.16)',
 };
 
 const peachTokens: ThemeTokens = {
@@ -266,8 +267,7 @@ export const THEME_PRESETS: ThemePresetMeta[] = [
       shadowRgb: '0, 0, 0',
       insetRgb: '20, 14, 12',
       selection: 'rgba(232, 168, 140, 0.35)',
-      textPrimary: '#f3e6dc',
-      textSecondary: '#cbb3a4',
+      textSecondary: '#b39a8a',
       modalBg: 'rgba(30, 24, 22, 0.95)',
     },
   },
@@ -293,8 +293,10 @@ export const THEME_PRESETS: ThemePresetMeta[] = [
       shadowRgb: '0, 0, 0',
       insetRgb: '12, 18, 28',
       selection: 'rgba(126, 176, 224, 0.35)',
-      textPrimary: '#e8eef6',
+      textPrimary: '#d7e2ef',
+      textDark: '#e8eef6',
       textSecondary: '#a8b8cc',
+      textLabel: 'rgba(215, 226, 239, 0.62)',
       modalBg: 'rgba(18, 24, 34, 0.95)',
     },
   },
@@ -320,8 +322,10 @@ export const THEME_PRESETS: ThemePresetMeta[] = [
       shadowRgb: '0, 0, 0',
       insetRgb: '12, 22, 18',
       selection: 'rgba(125, 207, 182, 0.35)',
-      textPrimary: '#e7f3ee',
-      textSecondary: '#a7c4b8',
+      textPrimary: '#d4e6de',
+      textDark: '#e6f2ec',
+      textSecondary: '#a3c0b4',
+      textLabel: 'rgba(212, 230, 222, 0.62)',
       modalBg: 'rgba(18, 26, 22, 0.95)',
     },
   },
@@ -347,8 +351,7 @@ export const THEME_PRESETS: ThemePresetMeta[] = [
       shadowRgb: '0, 0, 0',
       insetRgb: '22, 16, 10',
       selection: 'rgba(224, 164, 106, 0.35)',
-      textPrimary: '#f4eadc',
-      textSecondary: '#cbb39a',
+      textSecondary: '#b39a7e',
       modalBg: 'rgba(28, 22, 16, 0.95)',
     },
   },
@@ -447,6 +450,10 @@ export function deriveThemeFromAccent(accentHex: string, dark = false): ThemeTok
     const soft = hslToRgb(h, clamp(sat * 0.45, 0.12, 0.5), 0.35);
     const neighbor = hslToRgb((h + 0.08) % 1, clamp(sat * 0.35, 0.1, 0.4), 0.3);
     const cool = hslToRgb((h + 0.55) % 1, clamp(sat * 0.3, 0.08, 0.35), 0.28);
+    /* 按主色色相推导字色，避免冷色底仍用暖灰导致发灰发糊 */
+    const textPri = hslToRgb(h, clamp(sat * 0.12, 0.04, 0.18), 0.86);
+    const textDk = hslToRgb(h, clamp(sat * 0.1, 0.03, 0.16), 0.92);
+    const textSec = hslToRgb(h, clamp(sat * 0.16, 0.06, 0.22), 0.72);
     return {
       ...darkSurface,
       accent,
@@ -465,6 +472,10 @@ export function deriveThemeFromAccent(accentHex: string, dark = false): ThemeTok
       shadowRgb: '0, 0, 0',
       insetRgb: `${Math.round(deep.r * 0.2)}, ${Math.round(deep.g * 0.2)}, ${Math.round(deep.b * 0.2)}`,
       selection: rgba(mid.r, mid.g, mid.b, 0.35),
+      textPrimary: toHex(textPri),
+      textDark: toHex(textDk),
+      textSecondary: toHex(textSec),
+      textLabel: rgba(textPri.r, textPri.g, textPri.b, 0.62),
       modalBg: (() => {
         const m = hslToRgb(h, clamp(sat * 0.25, 0.08, 0.3), 0.12);
         return rgba(m.r, m.g, m.b, 0.95);

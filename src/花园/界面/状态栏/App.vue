@@ -1,15 +1,19 @@
 <template>
   <div id="garden-mvu-root" :style="themeCssVars" :data-theme-mode="themeMode">
-    <div class="mvu-status-bar">
+    <div class="mvu-status-bar" :class="{ 'is-main-collapsed': !settings.mainExpanded }">
       <WorldHeader />
-      <div class="main-grid">
-        <div class="left-panel">
-          <UserPanel />
-          <OrgPanel />
-        </div>
-        <div class="right-panel">
-          <CharacterList @select="openIdentity" />
-          <ActionBar @open="openPanel" />
+      <div ref="bodyRef" class="main-body" :aria-hidden="!settings.mainExpanded">
+        <div class="main-body-surface">
+          <div class="main-grid">
+            <div class="left-panel">
+              <UserPanel />
+              <OrgPanel />
+            </div>
+            <div class="right-panel">
+              <CharacterList @select="openIdentity" />
+              <ActionBar @open="openPanel" />
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -61,6 +65,8 @@ const themeMode = computed(() =>
 
 const panel = ref<OverlayPanel | null>(null);
 const focusName = ref<string | null>(null);
+const bodyRef = ref<HTMLElement | null>(null);
+let foldRo: ResizeObserver | null = null;
 
 function openPanel(next: GardenPanel) {
   focusName.value = null;
@@ -81,4 +87,28 @@ function closePanel() {
   panel.value = null;
   focusName.value = null;
 }
+
+/** 按表面 16/10.2 写入 --fold-h，供 CSS height 在 0↔像素 间过渡 */
+function syncFoldHeight() {
+  const el = bodyRef.value;
+  if (!el) return;
+  const width = el.getBoundingClientRect().width || el.clientWidth;
+  if (width <= 0) return;
+  el.style.setProperty('--fold-h', `${Math.ceil((width * 10.2) / 16)}px`);
+}
+
+onMounted(() => {
+  void nextTick(() => {
+    syncFoldHeight();
+    const el = bodyRef.value;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    foldRo = new ResizeObserver(() => syncFoldHeight());
+    foldRo.observe(el);
+  });
+});
+
+onBeforeUnmount(() => {
+  foldRo?.disconnect();
+  foldRo = null;
+});
 </script>

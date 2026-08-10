@@ -1,5 +1,20 @@
 <template>
-  <header class="world-header" :class="[mood, `period-${period}`, `weather-${weatherKind}`, { weekend: weekend }]">
+  <header
+    class="world-header"
+    :class="[
+      mood,
+      `period-${period}`,
+      `weather-${weatherKind}`,
+      { weekend: weekend, 'is-collapsed': !settings.mainExpanded },
+    ]"
+    role="button"
+    tabindex="0"
+    :aria-expanded="settings.mainExpanded"
+    :aria-label="settings.mainExpanded ? '收起下方面板' : '展开下方面板'"
+    @click="toggleMain"
+    @keydown.enter.prevent="toggleMain"
+    @keydown.space.prevent="toggleMain"
+  >
     <div class="world-header-glow" aria-hidden="true"></div>
 
     <div class="world-info-pill pill-date" :class="{ weekend: weekend }" style="--pill-i: 0">
@@ -95,10 +110,16 @@
         <span class="pill-value font-mono" :class="tempTextClass">{{ temp }}</span>
       </div>
     </div>
+
+    <span class="world-header-fold" aria-hidden="true">
+      <span class="world-header-fold-bar"></span>
+      <span class="world-header-fold-chevron"></span>
+    </span>
   </header>
 </template>
 
 <script setup lang="ts">
+import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
 import {
   classifyPeriod,
@@ -112,6 +133,11 @@ import {
 } from '../worldAtmosphere';
 
 const store = useDataStore();
+const { settings } = storeToRefs(useSettingsStore());
+
+function toggleMain() {
+  settings.value.mainExpanded = !settings.value.mainExpanded;
+}
 
 const date = computed(() => String(_.get(store.data, '系统.日期', '未知')));
 const week = computed(() => String(_.get(store.data, '系统.星期', '未知')));

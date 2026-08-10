@@ -54,8 +54,8 @@
           </div>
         </div>
       </article>
-      <div v-if="characters.length === 0" style="opacity: 0.5; padding: 20px; margin: auto">
-        当前没有在宅邸内的组织成员
+      <div v-if="characters.length === 0" class="roster-empty">
+        当前没有在场的组织成员
       </div>
     </div>
   </section>
