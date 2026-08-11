@@ -7,7 +7,12 @@
         <div class="id-card-layout">
           <!-- 左侧立绘 -->
           <aside class="id-card-portrait" :class="{ 'is-broken': broken }">
-            <PortraitImage :candidates="detail.srcs" :alt="detail.name" @broken="broken = true" @loaded="broken = false" />
+            <PortraitImage
+              :candidates="detail.srcs"
+              :alt="detail.name"
+              @broken="broken = true"
+              @loaded="broken = false"
+            />
             <div class="portrait-fallback">
               {{ detail.name }}
               <span>{{ settings.safeMode && detail.portraitR18 ? '安全模式已隐藏' : '立绘缺失' }}</span>

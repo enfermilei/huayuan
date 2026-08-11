@@ -114,7 +114,11 @@ export function buildPortraitUrlCandidates(
   options: { baseUrls?: readonly string[]; ext?: string } = {},
 ): string[] {
   const bases = (options.baseUrls?.length ? options.baseUrls : PORTRAIT_CDN_BASES)
-    .map(b => String(b || '').trim().replace(/\/+$/, ''))
+    .map(b =>
+      String(b || '')
+        .trim()
+        .replace(/\/+$/, ''),
+    )
     .filter(Boolean);
   const stems = portraitFileStemVariants(name, portraitState);
   const urls: string[] = [];

@@ -1,12 +1,5 @@
 <template>
-  <img
-    v-if="currentSrc"
-    :src="currentSrc"
-    :alt="alt"
-    :draggable="draggable"
-    @error="onError"
-    @load="onLoad"
-  />
+  <img v-if="currentSrc" :src="currentSrc" :alt="alt" :draggable="draggable" @error="onError" @load="onLoad" />
 </template>
 
 <script setup lang="ts">
