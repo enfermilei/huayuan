@@ -140,11 +140,7 @@
       </div>
     </div>
 
-    <PortraitGlassLightbox
-      v-model:open="glassOpen"
-      :candidates="glassCandidates"
-      :alt="detail?.name || ''"
-    />
+    <PortraitGlassLightbox v-model:open="glassOpen" :candidates="glassCandidates" :alt="detail?.name || ''" />
   </div>
 </template>
 
