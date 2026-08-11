@@ -1,6 +1,6 @@
 花园状态栏项目交接
 更新时间：2026-08-12
-当前推荐钉死 commit：推送后以 origin/main HEAD 为准（见文末 §13；发卡勿用 @main）
+当前推荐钉死 commit：5472db2（origin/main；3D 玻璃浮层 + 名册主题化 + 交接更新）
 功能基线 commit：ec75079（背包格子 / 立绘锁定 / Header 氛围 / 在场拖动点击修复 / 神无咲立绘）
 本地仓库：e:\tavern_helper_template-main → origin https://github.com/enfermilei/huayuan
 
@@ -8,7 +8,7 @@
 0. 新会话 60 秒上手
 ================================================================================
 
-1. git pull；确认 HEAD（应接近最新推送，勿停在旧 429eb2a）
+1. git pull；确认 HEAD（应接近 5472db2）
 2. 本地：pnpm watch + pnpm serve:cors
    正则「测试」→ http://127.0.0.1:5500/dist/花园/界面/状态栏/index.html
 3. 启用脚本：花园 MVU、花园变量结构；关 CDN「mvu美化」防双开
@@ -211,11 +211,11 @@ R18（安全模式隐藏）：主类型=性事；或 服装+裸体
   镜像：testingcf.jsdelivr.net（勿 raw.githubusercontent.com 作状态栏包）
   必须钉 commit，禁止 @main
 
-  当前推荐（推送后替换为实际 HEAD）：
+  当前推荐：
     状态栏：
-      https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@<HEAD>/dist/花园/界面/状态栏/index.html
+      https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@5472db2/dist/花园/界面/状态栏/index.html
     MVU：
-      import 'https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@<HEAD>/dist/花园/脚本/MVU/index.js';
+      import 'https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@5472db2/dist/花园/脚本/MVU/index.js';
 
   立绘资源根（可用 @main）：
     https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@main/portraits
@@ -225,12 +225,12 @@ R18（安全模式隐藏）：主类型=性事；或 服装+裸体
 <body>
   <script>
     $('body').load(
-      'https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@<HEAD>/dist/花园/界面/状态栏/index.html',
+      'https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@5472db2/dist/花园/界面/状态栏/index.html',
     );
   </script>
 </body>
 ```
-有新推送后，把 @<HEAD> 换成新 commit。角色卡内「mvu美化」与「测试」勿同时开。
+有新推送后，把 @5472db2 换成新 commit。角色卡内「mvu美化」与「测试」勿同时开。
 
 
 ================================================================================
@@ -313,7 +313,7 @@ ec75079   背包格子、立绘锁定、Header 氛围、在场点击修复  ← 
 429eb2a   早期推荐钉（已过时，勿再默认用）
 09b5706   立绘多 CDN 回退；角色档案显示 {{user}}
 53e30e1   [bot] bundle
-（本次推送）3D 玻璃浮层 + 名册/弹层主题化 + 交接文档更新 → 以 push 后 HEAD 为准
+5472db2   3D 玻璃浮层（名册+身份卡）+ 名册/弹层主题化 + 交接文档  ← 当前推荐钉
 
 
 ================================================================================
