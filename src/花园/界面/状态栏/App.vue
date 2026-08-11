@@ -88,14 +88,53 @@ function closePanel() {
   focusName.value = null;
 }
 
-/** 按表面 16/10.2 写入 --fold-h，供 CSS height 在 0↔像素 间过渡 */
+/** 按表面 16/10.2 写入 --fold-h（桌面折叠动画用）；窄屏改 height:auto，不再依赖该变量 */
 function syncFoldHeight() {
   const el = bodyRef.value;
   if (!el) return;
   const width = el.getBoundingClientRect().width || el.clientWidth;
   if (width <= 0) return;
+
+  // 窄屏用内容撑开，不走 --fold-h 高度动画
+  if (width <= 720) return;
+
   el.style.setProperty('--fold-h', `${Math.ceil((width * 10.2) / 16)}px`);
 }
+
+/** 折叠后按实际根节点高度写回宿主 iframe，避免大片空白 */
+function bumpHostFrameResize() {
+  requestAnimationFrame(() => {
+    try {
+      const root = document.getElementById('garden-mvu-root');
+      const nextH = Math.ceil(
+        Math.max(
+          root?.getBoundingClientRect().height || 0,
+          document.documentElement.scrollHeight || 0,
+          document.body.scrollHeight || 0,
+        ),
+      );
+      const frame = window.frameElement as HTMLIFrameElement | null;
+      if (frame && nextH > 0) {
+        frame.style.height = `${nextH}px`;
+      }
+      window.dispatchEvent(new Event('resize'));
+    } catch {
+      /* ignore */
+    }
+  });
+}
+
+watch(
+  () => settings.value.mainExpanded,
+  () => {
+    void nextTick(() => {
+      syncFoldHeight();
+      // 等一帧布局完成再量高；窄屏无 height 过渡，稍短即可
+      window.setTimeout(bumpHostFrameResize, 50);
+      window.setTimeout(bumpHostFrameResize, 220);
+    });
+  },
+);
 
 onMounted(() => {
   void nextTick(() => {
@@ -104,6 +143,8 @@ onMounted(() => {
     if (!el || typeof ResizeObserver === 'undefined') return;
     foldRo = new ResizeObserver(() => syncFoldHeight());
     foldRo.observe(el);
+    const surface = el.querySelector('.main-body-surface');
+    if (surface) foldRo.observe(surface);
   });
 });
 

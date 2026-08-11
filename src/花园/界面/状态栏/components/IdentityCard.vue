@@ -237,6 +237,8 @@ function openGlassLightbox() {
 }
 
 function onPortraitHover() {
+  // 触控设备无悬停；避免误开浮层
+  if (typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches) return;
   if (hoverOpenTimer) clearTimeout(hoverOpenTimer);
   hoverOpenTimer = setTimeout(() => openGlassLightbox(), 420);
 }

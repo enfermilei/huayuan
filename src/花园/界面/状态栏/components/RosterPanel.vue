@@ -140,7 +140,11 @@
       </div>
     </div>
 
-    <PortraitGlassLightbox v-model:open="glassOpen" :candidates="glassCandidates" :alt="detail?.name || ''" />
+    <PortraitGlassLightbox
+      v-model:open="glassOpen"
+      :candidates="glassCandidates"
+      :alt="detail?.name || ''"
+    />
   </div>
 </template>
 
@@ -170,6 +174,7 @@ function openGlassLightbox() {
 }
 
 function onPortraitHover() {
+  if (typeof window !== 'undefined' && window.matchMedia('(hover: none)').matches) return;
   if (hoverOpenTimer) clearTimeout(hoverOpenTimer);
   // 悬停稍作停留再打开，避免扫过时误触
   hoverOpenTimer = setTimeout(() => openGlassLightbox(), 420);

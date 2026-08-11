@@ -102,6 +102,9 @@ body {
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   width: 100%;
+  /* 按状态栏实际宽度自适应（iframe / 气泡列宽） */
+  container-type: inline-size;
+  container-name: garden-mvu;
   padding: 4px;
   background-color: var(--theme-bg);
   background-image:
@@ -166,6 +169,7 @@ body {
 
 #garden-mvu-root .mvu-status-bar.is-main-collapsed .main-body {
   height: 0;
+  overflow: hidden;
   opacity: 0;
   transform: translateY(10px);
   pointer-events: none;
@@ -2705,28 +2709,137 @@ body {
 }
 
 @media (max-width: 720px) {
-  #garden-mvu-root .mvu-status-bar {
+  /*
+   * 窄屏不要用 height:0 ↔ var(--fold-h) 过渡：Chromium 下容易卡在 0，
+   * 收起后子树仍按原高度参与 iframe 量高，出现大片空白。
+   * 改为展开 height:auto、收起瞬时 height:0（仍 overflow:hidden）。
+   */
+  #garden-mvu-root .main-body {
+    height: auto !important;
+    overflow: hidden;
+    transition:
+      opacity 0.2s ease-out,
+      transform 0.2s ease-out;
+  }
+
+  #garden-mvu-root .mvu-status-bar.is-main-collapsed .main-body {
+    height: 0 !important;
+    overflow: hidden !important;
+    opacity: 0;
+    transform: translateY(6px);
+    pointer-events: none;
+  }
+
+  #garden-mvu-root .main-body-surface {
     aspect-ratio: auto;
+    height: auto;
+  }
+
+  #garden-mvu-root .main-body-surface > .main-grid {
+    height: auto;
   }
 
   #garden-mvu-root .main-grid {
     grid-template-columns: 1fr;
   }
 
+  #garden-mvu-root .left-panel,
+  #garden-mvu-root .right-panel {
+    height: auto;
+    min-height: 0;
+  }
+
   #garden-mvu-root .left-panel > .panel.user-panel {
     max-height: none;
   }
 
+  #garden-mvu-root .left-panel > .panel.org-panel {
+    flex: 0 0 auto;
+    overflow: visible;
+    max-height: none;
+  }
+
+  #garden-mvu-root .character-list-wrapper {
+    flex-grow: 0;
+    overflow: visible;
+  }
+
+  /* 在场成员标题勿 sticky，否则会浮到角色档案上 */
+  #garden-mvu-root .character-list-wrapper > .panel-title {
+    position: static;
+    top: auto;
+    background: none;
+    padding-top: 0;
+    z-index: auto;
+  }
+
   #garden-mvu-root .world-header {
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    justify-content: stretch;
+    align-items: stretch;
+    padding: 4px 2px 14px;
   }
 
   #garden-mvu-root .world-info-pill {
-    flex: 1 1 40%;
+    flex: none;
+    width: auto;
+    min-width: 0;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  #garden-mvu-root .world-info-pill.pill-temp {
+    grid-column: 1 / -1;
+  }
+
+  #garden-mvu-root .pill-icon {
+    width: 30px;
+    height: 30px;
+  }
+
+  #garden-mvu-root .pill-label {
+    font-size: 0.64rem;
+    letter-spacing: 0.4px;
+    gap: 4px;
+  }
+
+  #garden-mvu-root .pill-value {
+    font-size: 0.92rem;
   }
 
   #garden-mvu-root .character-card {
-    width: 240px;
+    width: min(240px, calc(100% - 8px));
+    flex: 0 0 auto;
+  }
+
+  #garden-mvu-root .action-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  #garden-mvu-root .action-btn {
+    flex-direction: column;
+    white-space: nowrap;
+    min-height: 52px;
+    padding: 10px 6px;
+    font-size: 0.78rem;
+    letter-spacing: 0.5px;
+    gap: 4px;
+  }
+
+  #garden-mvu-root .action-btn-label {
+    line-height: 1.2;
+  }
+
+  #garden-mvu-root .panel {
+    padding: 14px;
+  }
+
+  #garden-mvu-root .character-list-wrapper {
+    padding: 14px 10px;
   }
 }
 
@@ -2754,7 +2867,8 @@ body {
     radial-gradient(at 14% 12%, var(--theme-glow-1) 0px, transparent 48%),
     radial-gradient(at 88% 18%, var(--theme-glow-2) 0px, transparent 46%),
     radial-gradient(at 78% 88%, var(--theme-glow-3) 0px, transparent 52%),
-    radial-gradient(at 18% 86%, var(--theme-glow-4) 0px, transparent 48%), var(--theme-modal-bg);
+    radial-gradient(at 18% 86%, var(--theme-glow-4) 0px, transparent 48%),
+    var(--theme-modal-bg);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-glass-hover);
   border-top: 1px solid var(--glass-edge-top);
@@ -2773,7 +2887,11 @@ body {
   padding: 16px 18px;
   border-bottom: 1px dashed color-mix(in srgb, var(--theme-accent) 28%, transparent);
   flex-shrink: 0;
-  background: linear-gradient(180deg, color-mix(in srgb, var(--theme-bg) 55%, transparent), transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--theme-bg) 55%, transparent),
+    transparent
+  );
 }
 
 #garden-mvu-root .modal-title {
@@ -2932,9 +3050,7 @@ body {
   -webkit-appearance: none;
   background: linear-gradient(135deg, var(--theme-btn-from), var(--theme-btn-to));
   box-shadow: var(--shadow-inset-frame);
-  transition:
-    transform 0.22s ease,
-    box-shadow 0.22s ease;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
 }
 
 #garden-mvu-root .detail-portrait.cursor-zoom-in {
@@ -5444,6 +5560,10 @@ body {
     height: 180px;
   }
 
+  #garden-mvu-root .garden-overlay {
+    padding: 8px;
+  }
+
   #garden-mvu-root .id-card-modal {
     aspect-ratio: auto;
     max-height: 100%;
@@ -5456,7 +5576,7 @@ body {
 
   #garden-mvu-root .id-card-portrait {
     aspect-ratio: 3 / 4;
-    max-height: 280px;
+    max-height: 240px;
   }
 
   #garden-mvu-root .id-card-meters,
@@ -5466,7 +5586,291 @@ body {
   }
 
   #garden-mvu-root .id-card-info {
-    padding: 16px;
+    padding: 14px 12px 12px;
+    gap: 10px;
+  }
+
+  #garden-mvu-root .id-card-name {
+    font-size: 1.35rem;
+  }
+
+  #garden-mvu-root .id-card-tabs {
+    gap: 4px;
+    padding: 3px;
+  }
+
+  #garden-mvu-root .id-tab {
+    white-space: nowrap;
+    letter-spacing: 0;
+    padding: 8px 6px;
+    font-size: 0.78rem;
+    min-height: 36px;
+  }
+
+  #garden-mvu-root .id-card-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  #garden-mvu-root .id-footer-btn {
+    flex: 1 1 calc(50% - 4px);
+    min-width: 0;
+    white-space: nowrap;
+  }
+}
+
+/* 手机气泡 / 极窄 iframe（实测约 250–360px） */
+@media (max-width: 420px) {
+  #garden-mvu-root {
+    font-size: 14px;
+    padding: 2px;
+    border-radius: var(--radius-lg);
+  }
+
+  #garden-mvu-root .world-header {
+    gap: 6px;
+    padding: 2px 0 12px;
+  }
+
+  #garden-mvu-root .world-info-pill {
+    padding: 7px 8px;
+    gap: 6px;
+    border-radius: 14px;
+  }
+
+  #garden-mvu-root .pill-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  #garden-mvu-root .wh-glyph {
+    width: 16px;
+    height: 16px;
+  }
+
+  #garden-mvu-root .pill-label {
+    font-size: 0.58rem;
+    letter-spacing: 0;
+  }
+
+  #garden-mvu-root .pill-hint {
+    display: none;
+  }
+
+  #garden-mvu-root .pill-value {
+    font-size: 0.8rem;
+    letter-spacing: 0;
+  }
+
+  #garden-mvu-root .panel-title {
+    font-size: 0.7rem;
+    letter-spacing: 1.5px;
+    margin-bottom: 10px;
+  }
+
+  #garden-mvu-root .action-btn {
+    min-height: 48px;
+    padding: 8px 4px;
+    font-size: 0.72rem;
+    letter-spacing: 0;
+    border-radius: 12px;
+  }
+
+  #garden-mvu-root .btn-icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  #garden-mvu-root .character-list {
+    gap: 10px;
+    padding: 4px 2px 10px;
+  }
+
+  #garden-mvu-root .character-card {
+    width: min(200px, calc(100% - 4px));
+  }
+
+  #garden-mvu-root .id-card-portrait {
+    max-height: 200px;
+  }
+
+  #garden-mvu-root .id-card-portrait-meta {
+    left: 8px;
+    bottom: 8px;
+    gap: 4px;
+  }
+
+  #garden-mvu-root .id-card-portrait-tag {
+    padding: 4px 8px;
+    font-size: 0.65rem;
+  }
+
+  #garden-mvu-root .id-card-close {
+    top: 8px;
+    right: 8px;
+    width: 32px;
+    height: 32px;
+  }
+
+  #garden-mvu-root .roster-modal .modal-header,
+  #garden-mvu-root .garden-modal .modal-header {
+    padding: 12px;
+  }
+
+  #garden-mvu-root .detail-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 容器查询：跟气泡实际宽度走（选择器相对 #garden-mvu-root 容器） */
+@container garden-mvu (max-width: 720px) {
+  .main-body {
+    height: auto !important;
+    overflow: hidden;
+    transition:
+      opacity 0.2s ease-out,
+      transform 0.2s ease-out;
+  }
+
+  .mvu-status-bar.is-main-collapsed .main-body {
+    height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .main-body-surface {
+    aspect-ratio: auto;
+    height: auto;
+  }
+
+  .main-body-surface > .main-grid {
+    height: auto;
+  }
+
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .left-panel,
+  .right-panel {
+    height: auto;
+  }
+
+  .left-panel > .panel.org-panel {
+    flex: 0 0 auto;
+    overflow: visible;
+    max-height: none;
+  }
+
+  .character-list-wrapper {
+    flex-grow: 0;
+    overflow: visible;
+  }
+
+  .character-list-wrapper > .panel-title {
+    position: static;
+    top: auto;
+    background: none;
+    padding-top: 0;
+    z-index: auto;
+  }
+
+  .world-header {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 4px 2px 14px;
+  }
+
+  .world-info-pill {
+    flex: none;
+    min-width: 0;
+    padding: 8px 12px;
+    gap: 8px;
+  }
+
+  .world-info-pill.pill-temp {
+    grid-column: 1 / -1;
+  }
+
+  .action-bar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .action-btn {
+    flex-direction: column;
+    white-space: nowrap;
+    min-height: 52px;
+    padding: 10px 6px;
+    font-size: 0.78rem;
+    letter-spacing: 0.5px;
+    gap: 4px;
+  }
+
+  .character-card {
+    width: min(240px, calc(100% - 8px));
+  }
+
+  .garden-overlay {
+    padding: 8px;
+  }
+
+  .id-card-layout {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+
+  .id-card-portrait {
+    aspect-ratio: 3 / 4;
+    max-height: 240px;
+  }
+
+  .id-tab {
+    white-space: nowrap;
+    letter-spacing: 0;
+    padding: 8px 6px;
+    font-size: 0.78rem;
+    min-height: 36px;
+  }
+}
+
+@container garden-mvu (max-width: 420px) {
+  .pill-hint {
+    display: none;
+  }
+
+  .pill-label {
+    font-size: 0.58rem;
+    letter-spacing: 0;
+  }
+
+  .pill-value {
+    font-size: 0.8rem;
+  }
+
+  .world-info-pill {
+    padding: 7px 8px;
+    gap: 6px;
+  }
+
+  .pill-icon {
+    width: 26px;
+    height: 26px;
+  }
+
+  .action-btn {
+    min-height: 48px;
+    font-size: 0.72rem;
+    letter-spacing: 0;
+  }
+
+  .id-card-portrait {
+    max-height: 200px;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
   }
 }
 

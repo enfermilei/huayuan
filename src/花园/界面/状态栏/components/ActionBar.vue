@@ -1,20 +1,20 @@
 <template>
   <div class="action-bar">
-    <button class="action-btn" type="button" @click="emit('open', 'roster')">
-      <span class="btn-icon icon-roster"></span>
-      成员名册
+    <button class="action-btn" type="button" aria-label="成员名册" @click="emit('open', 'roster')">
+      <span class="btn-icon icon-roster" aria-hidden="true"></span>
+      <span class="action-btn-label">成员名册</span>
     </button>
-    <button class="action-btn" type="button" @click="emit('open', 'map')">
-      <span class="btn-icon icon-map"></span>
-      组织地图
+    <button class="action-btn" type="button" aria-label="组织地图" @click="emit('open', 'map')">
+      <span class="btn-icon icon-map" aria-hidden="true"></span>
+      <span class="action-btn-label">组织地图</span>
     </button>
-    <button class="action-btn" type="button" @click="emit('open', 'bag')">
-      <span class="btn-icon icon-bag"></span>
-      背包
+    <button class="action-btn" type="button" aria-label="背包" @click="emit('open', 'bag')">
+      <span class="btn-icon icon-bag" aria-hidden="true"></span>
+      <span class="action-btn-label">背包</span>
     </button>
-    <button class="action-btn" type="button" @click="emit('open', 'settings')">
-      <span class="btn-icon icon-settings"></span>
-      设置
+    <button class="action-btn" type="button" aria-label="设置" @click="emit('open', 'settings')">
+      <span class="btn-icon icon-settings" aria-hidden="true"></span>
+      <span class="action-btn-label">设置</span>
     </button>
   </div>
 </template>

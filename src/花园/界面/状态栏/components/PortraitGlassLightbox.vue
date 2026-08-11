@@ -11,6 +11,9 @@
         :aria-label="alt ? `${alt} 立绘预览` : '立绘预览'"
         @click.self="close"
       >
+        <button class="portrait-glass-lb__close" type="button" aria-label="关闭立绘预览" @click.stop="close">
+          ×
+        </button>
         <div ref="stageRef" class="portrait-glass-lb__stage">
           <div class="portrait-glass-lb__card" :style="cardStyle" @click.stop>
             <div class="portrait-glass-lb__glare" :style="glareStyle" aria-hidden="true"></div>
@@ -73,6 +76,12 @@ let listening = false;
 
 const maxTilt = computed(() => Math.min(12, Math.max(3, Number(props.maxTilt) || 7)));
 
+/** 精细指针才启用「移出即关」；触控只靠关闭按钮 / 点遮罩 */
+const canHoverClose = computed(() => {
+  if (typeof window === 'undefined') return false;
+  return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+});
+
 const cardStyle = computed(() => ({
   transform: `rotateX(${currRX.value.toFixed(3)}deg) rotateY(${currRY.value.toFixed(3)}deg) scale(1)`,
 }));
@@ -128,7 +137,7 @@ function ensureAnim() {
 
 /**
  * 相对「未旋转的舞台」算倾角，避免 getBoundingClientRect 随 3D 变形反馈抖动。
- * 指针在舞台外 → 准备关闭。
+ * 指针在舞台外 → 仅桌面悬停模式准备关闭。
  */
 function applyPointer(clientX: number, clientY: number) {
   const stage = stageRef.value;
@@ -145,7 +154,8 @@ function applyPointer(clientX: number, clientY: number) {
     clientY <= rect.bottom + pad;
 
   if (!inside) {
-    scheduleClose();
+    resetTilt();
+    if (canHoverClose.value) scheduleClose();
     return;
   }
 
@@ -249,7 +259,7 @@ onBeforeUnmount(() => {
   z-index: 10050;
   display: grid;
   place-items: center;
-  padding: clamp(8px, 1.5vw, 20px);
+  padding: clamp(8px, 2%, 20px);
   background: rgba(0, 0, 0, 0.45);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -257,10 +267,33 @@ onBeforeUnmount(() => {
   cursor: zoom-out;
 }
 
+.portrait-glass-lb__close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10051;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(12, 16, 24, 0.55);
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  -webkit-tap-highlight-color: transparent;
+}
+
+.portrait-glass-lb__close:active {
+  transform: scale(0.94);
+}
+
 .portrait-glass-lb__stage {
-  /* 更大预览：接近视口高度 */
-  width: min(96vw, calc(94vh * 832 / 1216), 560px);
-  max-width: 96vw;
+  /* 相对浮层尺寸，避免宿主 vh 把卡片撑破 iframe */
+  width: min(96%, 560px);
+  max-height: 92%;
   perspective: 1200px;
   perspective-origin: 50% 42%;
   transform-style: preserve-3d;
@@ -270,9 +303,9 @@ onBeforeUnmount(() => {
   position: relative;
   width: 100%;
   aspect-ratio: 832 / 1216;
-  max-height: 94vh;
+  max-height: 92%;
   margin: 0 auto;
-  border-radius: 28px;
+  border-radius: clamp(16px, 4vw, 28px);
   border: 1px solid rgba(255, 255, 255, 0.32);
   background: rgba(255, 255, 255, 0.1);
   box-shadow:
@@ -336,16 +369,16 @@ onBeforeUnmount(() => {
 
 .portrait-glass-lb__caption {
   position: absolute;
-  left: 16px;
-  right: 16px;
-  bottom: 14px;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
   z-index: 4;
-  padding: 9px 14px;
+  padding: 8px 12px;
   border-radius: 14px;
   background: rgba(12, 16, 24, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.18);
   color: rgba(255, 255, 255, 0.94);
-  font-size: 14px;
+  font-size: clamp(12px, 3.5vw, 14px);
   letter-spacing: 0.04em;
   text-align: center;
   backdrop-filter: blur(8px);
@@ -375,5 +408,22 @@ onBeforeUnmount(() => {
 .glass-lb-leave-to .portrait-glass-lb__card {
   opacity: 0;
   transform: scale(0.9) translateY(12px);
+}
+
+@media (max-width: 420px) {
+  .portrait-glass-lb {
+    padding: 8px;
+  }
+
+  .portrait-glass-lb__close {
+    top: 8px;
+    right: 8px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .portrait-glass-lb__stage {
+    width: min(98%, 560px);
+  }
 }
 </style>
