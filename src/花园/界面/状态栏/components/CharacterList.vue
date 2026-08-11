@@ -11,7 +11,13 @@
         @pointerdown="onCardPointerDown(char.name, $event)"
       >
         <div class="portrait-area" :class="{ 'is-broken': brokenPortraits.has(char.name) }">
-          <img :src="char.src" :alt="char.name" draggable="false" @error="brokenPortraits.add(char.name)" />
+          <PortraitImage
+            :candidates="char.srcs"
+            :alt="char.name"
+            :draggable="false"
+            @broken="brokenPortraits.add(char.name)"
+            @loaded="brokenPortraits.delete(char.name)"
+          />
           <div class="portrait-fallback">
             {{ char.name }}
             <span style="font-size: 0.7rem; opacity: 0.6">立绘缺失</span>
@@ -60,9 +66,10 @@
 </template>
 
 <script setup lang="ts">
+import PortraitImage from './PortraitImage.vue';
 import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
-import { asRecord, isPresent, resolvePortrait, toPercent } from '../utils';
+import { asRecord, isPresent, resolvePortraitCandidates, toPercent } from '../utils';
 
 const emit = defineEmits<{ select: [name: string] }>();
 
@@ -93,7 +100,7 @@ type CharCard = {
   loyalPct: number;
   isDanger: boolean;
   snippet: string;
-  src: string;
+  srcs: string[];
 };
 
 const characters = computed(() => {
@@ -117,7 +124,7 @@ const characters = computed(() => {
       loyalPct: toPercent(loyal),
       isDanger: loyal < 0,
       snippet,
-      src: resolvePortrait(name, _.get(d, '立绘状态', {}), 'card'),
+      srcs: resolvePortraitCandidates(name, _.get(d, '立绘状态', {}), 'card'),
     });
   });
 
@@ -125,7 +132,7 @@ const characters = computed(() => {
 });
 
 watch(
-  () => characters.value.map(c => c.src).join('|'),
+  () => characters.value.map(c => c.srcs[0] || '').join('|'),
   () => brokenPortraits.clear(),
 );
 

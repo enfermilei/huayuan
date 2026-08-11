@@ -1,10 +1,10 @@
 <template>
   <section class="panel user-panel">
-    <h3 class="panel-title">主人档案</h3>
+    <h3 class="panel-title">角色档案</h3>
     <div class="user-header">
-      <div class="user-avatar">主</div>
+      <div class="user-avatar">{{ avatarGlyph }}</div>
       <div class="user-name-block">
-        <div class="user-name">主角</div>
+        <div class="user-name">{{ userName }}</div>
         <div class="user-subtitle">{{ subtitle }}</div>
       </div>
     </div>
@@ -41,6 +41,17 @@ import { useDataStore } from '../store';
 import { formatMoney } from '../utils';
 
 const store = useDataStore();
+
+const userName = computed(() => {
+  try {
+    const fromMacro = SillyTavern.substituteParams?.('{{user}}')?.trim();
+    if (fromMacro && fromMacro !== '{{user}}') return fromMacro;
+  } catch {
+    /* ignore */
+  }
+  return String(SillyTavern.name1 || '用户').trim() || '用户';
+});
+const avatarGlyph = computed(() => Array.from(userName.value)[0] || '角');
 
 const role = computed(() => String(_.get(store.data, '主角.职务', '待初始化')));
 const loc = computed(() => String(_.get(store.data, '主角.当前位置', '待初始化')));

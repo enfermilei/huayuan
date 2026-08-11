@@ -1,13 +1,13 @@
 import { useCustomPortraitsStore } from './customPortraits';
 import {
-  buildPortraitUrl,
+  buildPortraitUrlCandidates,
   isR18Portrait,
   normalizePortraitState,
-  portraitFileStem,
+  portraitFileStemVariants,
   SAFE_PORTRAIT_STATE,
 } from './portrait';
 import { usePortraitLocksStore } from './portraitLocks';
-import { DEFAULT_PORTRAIT_BASE, DEFAULT_PORTRAIT_EXT, useSettingsStore } from './settings';
+import { DEFAULT_PORTRAIT_EXT, useSettingsStore } from './settings';
 
 export function formatMoney(n: unknown): string {
   const num = Number(n) || 0;
@@ -61,15 +61,7 @@ export function isPresent(value: unknown): boolean {
   return value === true || value === 'true' || value === 1 || value === '1';
 }
 
-/**
- * 立绘 URL 优先级：
- * 1. 本机锁定立绘（忽略 MVU 当前立绘状态）
- * 2. 安全模式且为 R18 → 强制回退日常-普通-1
- * 3. 本机自定义立绘（IndexedDB）
- * 4. 官方 CDN `{base}/{角色名}/{stem}.png`
- * 5. placehold 占位
- */
-export function resolvePortrait(name: string, portraitState: unknown, size: 'card' | 'full' = 'card'): string {
+function resolveEffectivePortraitState(name: string, portraitState: unknown) {
   let safeMode = false;
   try {
     const settings = useSettingsStore();
@@ -88,31 +80,58 @@ export function resolvePortrait(name: string, portraitState: unknown, size: 'car
     /* pinia 未就绪 */
   }
 
-  let customUrls: Record<string, string> = {};
+  const originalR18 = isR18Portrait(effectiveState);
+  const state = safeMode && originalR18 ? SAFE_PORTRAIT_STATE : normalizePortraitState(effectiveState);
+  return { safeMode, originalR18, state };
+}
+
+/**
+ * 立绘 URL 候选（按优先级）：
+ * 1. 本机锁定立绘（忽略 MVU 当前立绘状态）
+ * 2. 安全模式且为 R18 → 强制回退日常-普通-1
+ * 3. 本机自定义立绘（IndexedDB，含文件名别名键）
+ * 4. 官方 CDN（含「普通/正常」「疑惑/困惑」文件名变体与多 CDN 回退）
+ * 5. placehold 占位
+ *
+ * 调用方应在 `<img @error>` 时依次尝试下一个候选，避免 CDN 延迟或命名别名导致一次失败就永久显示缺失。
+ */
+export function resolvePortraitCandidates(
+  name: string,
+  portraitState: unknown,
+  size: 'card' | 'full' = 'card',
+): string[] {
+  const { safeMode, originalR18, state } = resolveEffectivePortraitState(name, portraitState);
+  const stems = portraitFileStemVariants(name, state);
+  const urls: string[] = [];
+
   try {
-    const custom = useCustomPortraitsStore();
-    void custom.revision;
-    customUrls = custom.urls;
+    const customStore = useCustomPortraitsStore();
+    void customStore.revision;
+    for (const stem of stems) {
+      const custom = customStore.urls[stem];
+      if (custom) urls.push(custom);
+    }
   } catch {
     /* pinia 未就绪 */
   }
 
-  const originalR18 = isR18Portrait(effectiveState);
-  const state = safeMode && originalR18 ? SAFE_PORTRAIT_STATE : normalizePortraitState(effectiveState);
-  const stem = portraitFileStem(name, state);
-
-  const custom = customUrls[stem];
-  if (custom) return custom;
-
-  const real = buildPortraitUrl(name, state, {
-    baseUrl: DEFAULT_PORTRAIT_BASE,
-    ext: DEFAULT_PORTRAIT_EXT,
-  });
-  if (real) return real;
+  urls.push(
+    ...buildPortraitUrlCandidates(name, state, {
+      ext: DEFAULT_PORTRAIT_EXT,
+    }),
+  );
 
   const dim = size === 'full' ? '420x700' : '300x500';
-  const label = safeMode && originalR18 ? '安全模式' : stem;
-  return `https://placehold.co/${dim}/FFD4C2/6B5548?text=${encodeURIComponent(label)}`;
+  const label = safeMode && originalR18 ? '安全模式' : stems[0] || String(name || '立绘');
+  urls.push(`https://placehold.co/${dim}/FFD4C2/6B5548?text=${encodeURIComponent(label)}`);
+
+  return [...new Set(urls.filter(Boolean))];
+}
+
+/** 返回首个可用候选；加载失败时请改用 resolvePortraitCandidates 逐个尝试 */
+export function resolvePortrait(name: string, portraitState: unknown, size: 'card' | 'full' = 'card'): string {
+  const candidates = resolvePortraitCandidates(name, portraitState, size);
+  return candidates[0] || '';
 }
 
 export function asRecord(value: unknown): Record<string, any> {

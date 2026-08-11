@@ -108,8 +108,9 @@ export const Schema = z.object({
             .transform(data => {
               const main = data.主类型;
               let sub = String(data.次类型 || '').trim();
-              // 常见别名：示例「正常」→「普通」；「校服」→「水手服」
+              // 常见别名：示例「正常」→「普通」；「困惑」→「疑惑」；「校服」→「水手服」
               if (main === '日常' && sub === '正常') sub = '普通';
+              if (main === '日常' && sub === '困惑') sub = '疑惑';
               if (main === '服装' && sub === '校服') sub = '水手服';
 
               const allowed: Record<typeof main, string[]> = {

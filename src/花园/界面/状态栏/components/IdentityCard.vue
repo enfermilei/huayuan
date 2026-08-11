@@ -7,7 +7,7 @@
         <div class="id-card-layout">
           <!-- 左侧立绘 -->
           <aside class="id-card-portrait" :class="{ 'is-broken': broken }">
-            <img :src="detail.src" :alt="detail.name" @error="broken = true" />
+            <PortraitImage :candidates="detail.srcs" :alt="detail.name" @broken="broken = true" @loaded="broken = false" />
             <div class="portrait-fallback">
               {{ detail.name }}
               <span>{{ settings.safeMode && detail.portraitR18 ? '安全模式已隐藏' : '立绘缺失' }}</span>
@@ -178,13 +178,14 @@
 </template>
 
 <script setup lang="ts">
+import PortraitImage from './PortraitImage.vue';
 import { useCustomPortraitsStore } from '../customPortraits';
 import { parseInventory } from '../inventory';
 import { isR18Portrait, normalizePortraitState } from '../portrait';
 import { usePortraitLocksStore } from '../portraitLocks';
 import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
-import { asRecord, formatMoney, isPresent, resolvePortrait, toPercent } from '../utils';
+import { asRecord, formatMoney, isPresent, resolvePortraitCandidates, toPercent } from '../utils';
 import InventoryGrid from './InventoryGrid.vue';
 
 const props = defineProps<{ memberName: string }>();
@@ -266,7 +267,7 @@ const detail = computed(() => {
     portraitSub: display.次类型,
     portraitR18: isR18Portrait(display),
     portraitLocked: locked,
-    src: resolvePortrait(props.memberName, portrait, 'full'),
+    srcs: resolvePortraitCandidates(props.memberName, portrait, 'full'),
     body,
     outfit: (['上衣', '下装', '袜', '鞋', '配饰'] as const)
       .map(k => String(outfitObj[k] || ''))

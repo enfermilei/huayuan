@@ -2908,6 +2908,28 @@ body {
   display: block;
 }
 
+#garden-mvu-root .detail-portrait .portrait-fallback {
+  display: none;
+  position: absolute;
+  inset: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  background: linear-gradient(135deg, #f5e6d8, #ffe8d6);
+}
+
+#garden-mvu-root .detail-portrait.is-broken img {
+  opacity: 0;
+}
+
+#garden-mvu-root .detail-portrait.is-broken .portrait-fallback {
+  display: flex;
+}
+
 #garden-mvu-root .detail-identity {
   flex: 1;
   min-width: 0;

@@ -28,9 +28,14 @@
 
         <section v-if="detail" class="roster-detail">
           <div class="detail-hero">
-            <div class="detail-portrait">
-              <img :src="detail.src" :alt="detail.name" @error="broken.add(detail.name)" />
-              <div v-if="broken.has(detail.name)" class="portrait-fallback">{{ detail.name }}</div>
+            <div class="detail-portrait" :class="{ 'is-broken': broken.has(detail.name) }">
+              <PortraitImage
+                :candidates="detail.srcs"
+                :alt="detail.name"
+                @broken="broken.add(detail.name)"
+                @loaded="broken.delete(detail.name)"
+              />
+              <div class="portrait-fallback">{{ detail.name }}</div>
             </div>
             <div class="detail-identity">
               <div class="detail-name">
@@ -132,8 +137,9 @@
 import { parseInventory } from '../inventory';
 import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
-import { asRecord, formatMoney, isPresent, resolvePortrait, toPercent } from '../utils';
+import { asRecord, formatMoney, isPresent, resolvePortraitCandidates, toPercent } from '../utils';
 import InventoryGrid from './InventoryGrid.vue';
+import PortraitImage from './PortraitImage.vue';
 
 const props = defineProps<{ focusName?: string | null }>();
 const emit = defineEmits<{ close: [] }>();
@@ -215,7 +221,7 @@ const detail = computed(() => {
     pregnant: Boolean(_.get(d, '是否怀孕', false)),
     portraitMain: String(_.get(d, '立绘状态.主类型', '日常')),
     portraitSub: String(_.get(d, '立绘状态.次类型', '普通')),
-    src: resolvePortrait(m.name, _.get(d, '立绘状态', {}), 'card'),
+    srcs: resolvePortraitCandidates(m.name, _.get(d, '立绘状态', {}), 'card'),
     body,
     outfit: (['上衣', '下装', '袜', '鞋', '配饰'] as const)
       .map(k => String(outfitObj[k] || ''))
