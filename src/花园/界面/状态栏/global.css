@@ -4771,12 +4771,7 @@ body {
 }
 
 #garden-mvu-root[data-theme-mode='dark'] .pill-sheen {
-  background: linear-gradient(
-    115deg,
-    transparent 38%,
-    rgba(255, 255, 255, 0.22) 50%,
-    transparent 62%
-  );
+  background: linear-gradient(115deg, transparent 38%, rgba(255, 255, 255, 0.22) 50%, transparent 62%);
 }
 
 #garden-mvu-root .id-card-modal.is-danger {

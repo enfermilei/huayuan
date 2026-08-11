@@ -54,9 +54,7 @@
           </div>
         </div>
       </article>
-      <div v-if="characters.length === 0" class="roster-empty">
-        当前没有在场的组织成员
-      </div>
+      <div v-if="characters.length === 0" class="roster-empty">当前没有在场的组织成员</div>
     </div>
   </section>
 </template>
