@@ -117,12 +117,7 @@
           <div v-if="settings.themePreset === 'custom'" class="theme-custom-block">
             <label class="theme-custom-row">
               <span class="theme-custom-label">主色</span>
-              <input
-                class="theme-color-input"
-                type="color"
-                :value="settings.themeAccent"
-                @input="onAccentInput"
-              />
+              <input class="theme-color-input" type="color" :value="settings.themeAccent" @input="onAccentInput" />
               <input
                 class="settings-input theme-hex-input"
                 type="text"
@@ -272,9 +267,7 @@ const store = useSettingsStore();
 const { settings } = storeToRefs(store);
 const { reset, setThemePreset, setThemeAccent, setThemeDark } = store;
 
-const customPreview = computed(() =>
-  deriveThemeFromAccent(settings.value.themeAccent, settings.value.themeDark),
-);
+const customPreview = computed(() => deriveThemeFromAccent(settings.value.themeAccent, settings.value.themeDark));
 
 function pickPreset(id: Exclude<ThemePresetId, 'custom'>) {
   settings.value.themeAccent = presetAccent(id);
