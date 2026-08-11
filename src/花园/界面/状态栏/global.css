@@ -2867,8 +2867,7 @@ body {
     radial-gradient(at 14% 12%, var(--theme-glow-1) 0px, transparent 48%),
     radial-gradient(at 88% 18%, var(--theme-glow-2) 0px, transparent 46%),
     radial-gradient(at 78% 88%, var(--theme-glow-3) 0px, transparent 52%),
-    radial-gradient(at 18% 86%, var(--theme-glow-4) 0px, transparent 48%),
-    var(--theme-modal-bg);
+    radial-gradient(at 18% 86%, var(--theme-glow-4) 0px, transparent 48%), var(--theme-modal-bg);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-glass-hover);
   border-top: 1px solid var(--glass-edge-top);
@@ -2887,11 +2886,7 @@ body {
   padding: 16px 18px;
   border-bottom: 1px dashed color-mix(in srgb, var(--theme-accent) 28%, transparent);
   flex-shrink: 0;
-  background: linear-gradient(
-    180deg,
-    color-mix(in srgb, var(--theme-bg) 55%, transparent),
-    transparent
-  );
+  background: linear-gradient(180deg, color-mix(in srgb, var(--theme-bg) 55%, transparent), transparent);
 }
 
 #garden-mvu-root .modal-title {
@@ -3050,7 +3045,9 @@ body {
   -webkit-appearance: none;
   background: linear-gradient(135deg, var(--theme-btn-from), var(--theme-btn-to));
   box-shadow: var(--shadow-inset-frame);
-  transition: transform 0.22s ease, box-shadow 0.22s ease;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
 }
 
 #garden-mvu-root .detail-portrait.cursor-zoom-in {

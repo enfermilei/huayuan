@@ -11,9 +11,7 @@
         :aria-label="alt ? `${alt} 立绘预览` : '立绘预览'"
         @click.self="close"
       >
-        <button class="portrait-glass-lb__close" type="button" aria-label="关闭立绘预览" @click.stop="close">
-          ×
-        </button>
+        <button class="portrait-glass-lb__close" type="button" aria-label="关闭立绘预览" @click.stop="close">×</button>
         <div ref="stageRef" class="portrait-glass-lb__stage">
           <div class="portrait-glass-lb__card" :style="cardStyle" @click.stop>
             <div class="portrait-glass-lb__glare" :style="glareStyle" aria-hidden="true"></div>
