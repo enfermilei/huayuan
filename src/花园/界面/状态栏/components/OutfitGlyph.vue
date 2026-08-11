@@ -1,12 +1,6 @@
 <template>
   <!-- 着装槽位剪影：描边图标，跟随 currentColor；动效由外层 .outfit-item:hover 触发 -->
-  <svg
-    class="outfit-glyph"
-    :class="`glyph-${slot}`"
-    viewBox="0 0 24 24"
-    aria-hidden="true"
-    focusable="false"
-  >
+  <svg class="outfit-glyph" :class="`glyph-${slot}`" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
     <!-- 上衣：短袖圆领 -->
     <g
       v-if="slot === '上衣'"
@@ -17,9 +11,7 @@
       stroke-linejoin="round"
     >
       <path d="M8.2 5.2 C9.1 4.2 10.4 3.6 12 3.6 C13.6 3.6 14.9 4.2 15.8 5.2" />
-      <path
-        d="M8.2 5.2 L5.2 7.4 L7.1 10.1 L9.2 8.6 L9.2 19.4 L14.8 19.4 L14.8 8.6 L16.9 10.1 L18.8 7.4 L15.8 5.2"
-      />
+      <path d="M8.2 5.2 L5.2 7.4 L7.1 10.1 L9.2 8.6 L9.2 19.4 L14.8 19.4 L14.8 8.6 L16.9 10.1 L18.8 7.4 L15.8 5.2" />
       <path d="M9.6 5.6 C10.2 6.5 11 7 12 7 C13 7 13.8 6.5 14.4 5.6" />
     </g>
 
@@ -71,14 +63,7 @@
     </g>
 
     <!-- 配饰：项链环 + 吊坠 -->
-    <g
-      v-else
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.7"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    >
+    <g v-else fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
       <ellipse cx="12" cy="8.2" rx="6.4" ry="3.2" />
       <path d="M12 11.4 V14.2" />
       <path d="M12 14.2 L10.2 17.6 H13.8 Z" />

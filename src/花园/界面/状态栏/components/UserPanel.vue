@@ -40,12 +40,7 @@
       </button>
       <div id="user-outfit-list" class="outfit-list-fold" :hidden="!settings.outfitExpanded">
         <div class="outfit-list">
-          <div
-            v-for="chip in outfitChips"
-            :key="chip.slot"
-            class="outfit-item"
-            :data-slot="chip.slot"
-          >
+          <div v-for="chip in outfitChips" :key="chip.slot" class="outfit-item" :data-slot="chip.slot">
             <span class="gear-icon-slot" aria-hidden="true">
               <OutfitGlyph :slot="chip.slot" />
             </span>

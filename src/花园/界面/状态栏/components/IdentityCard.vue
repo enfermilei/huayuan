@@ -160,12 +160,7 @@
                 <div class="id-section">
                   <div class="sub-section-title">今日着装</div>
                   <div class="outfit-list">
-                    <div
-                      v-for="chip in detail.outfit"
-                      :key="chip.slot"
-                      class="outfit-item"
-                      :data-slot="chip.slot"
-                    >
+                    <div v-for="chip in detail.outfit" :key="chip.slot" class="outfit-item" :data-slot="chip.slot">
                       <span class="gear-icon-slot" aria-hidden="true">
                         <OutfitGlyph :slot="chip.slot" />
                       </span>

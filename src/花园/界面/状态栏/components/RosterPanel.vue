@@ -126,12 +126,7 @@
           <div class="detail-block">
             <div class="sub-section-title">着装</div>
             <div class="outfit-list">
-              <div
-                v-for="chip in detail.outfit"
-                :key="chip.slot"
-                class="outfit-item"
-                :data-slot="chip.slot"
-              >
+              <div v-for="chip in detail.outfit" :key="chip.slot" class="outfit-item" :data-slot="chip.slot">
                 <span class="gear-icon-slot" aria-hidden="true">
                   <OutfitGlyph :slot="chip.slot" />
                 </span>
@@ -152,11 +147,7 @@
       </div>
     </div>
 
-    <PortraitGlassLightbox
-      v-model:open="glassOpen"
-      :candidates="glassCandidates"
-      :alt="detail?.name || ''"
-    />
+    <PortraitGlassLightbox v-model:open="glassOpen" :candidates="glassCandidates" :alt="detail?.name || ''" />
   </div>
 </template>
 
