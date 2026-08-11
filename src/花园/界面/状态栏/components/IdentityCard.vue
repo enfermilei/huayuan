@@ -5,8 +5,15 @@
 
       <template v-if="detail">
         <div class="id-card-layout">
-          <!-- 左侧立绘 -->
-          <aside class="id-card-portrait" :class="{ 'is-broken': broken }">
+          <!-- 左侧立绘：点击/悬停打开 3D 玻璃浮层；底部标签按钮不触发 -->
+          <aside
+            class="id-card-portrait cursor-zoom-in"
+            :class="{ 'is-broken': broken }"
+            :title="broken ? undefined : `查看 ${detail.name} 立体立绘`"
+            @click="openGlassLightbox"
+            @mouseenter="onPortraitHover"
+            @mouseleave="cancelPortraitHover"
+          >
             <PortraitImage
               :candidates="detail.srcs"
               :alt="detail.name"
@@ -19,7 +26,7 @@
               <button class="portrait-upload-btn" type="button" @click.stop="pickPortrait">上传立绘</button>
             </div>
             <div class="id-card-portrait-veil"></div>
-            <div class="id-card-portrait-meta">
+            <div class="id-card-portrait-meta" @click.stop @mouseenter.stop="cancelPortraitHover">
               <span class="id-card-portrait-tag">{{ detail.portraitMain }}</span>
               <span class="id-card-portrait-tag">{{ detail.portraitSub }}</span>
               <span v-if="detail.portraitLocked" class="id-card-portrait-tag locked">已锁定</span>
@@ -179,11 +186,16 @@
         <button class="modal-close" type="button" @click="emit('close')">关闭</button>
       </div>
     </div>
+
+    <PortraitGlassLightbox
+      v-model:open="glassOpen"
+      :candidates="detail?.srcs || []"
+      :alt="detail?.name || memberName"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import PortraitImage from './PortraitImage.vue';
 import { useCustomPortraitsStore } from '../customPortraits';
 import { parseInventory } from '../inventory';
 import { isR18Portrait, normalizePortraitState } from '../portrait';
@@ -192,6 +204,8 @@ import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
 import { asRecord, formatMoney, isPresent, resolvePortraitCandidates, toPercent } from '../utils';
 import InventoryGrid from './InventoryGrid.vue';
+import PortraitGlassLightbox from './PortraitGlassLightbox.vue';
+import PortraitImage from './PortraitImage.vue';
 
 const props = defineProps<{ memberName: string }>();
 const emit = defineEmits<{ close: []; openRoster: [name: string] }>();
@@ -213,7 +227,26 @@ const activeTab = ref<TabId>('profile');
 const thoughtExpanded = ref(false);
 const hoverMeter = ref<'like' | 'loyal' | null>(null);
 const broken = ref(false);
+const glassOpen = ref(false);
 const portraitFileInput = ref<HTMLInputElement | null>(null);
+let hoverOpenTimer: ReturnType<typeof setTimeout> | null = null;
+
+function openGlassLightbox() {
+  if (!detail.value || broken.value) return;
+  glassOpen.value = true;
+}
+
+function onPortraitHover() {
+  if (hoverOpenTimer) clearTimeout(hoverOpenTimer);
+  hoverOpenTimer = setTimeout(() => openGlassLightbox(), 420);
+}
+
+function cancelPortraitHover() {
+  if (hoverOpenTimer) {
+    clearTimeout(hoverOpenTimer);
+    hoverOpenTimer = null;
+  }
+}
 
 watch(
   () => props.memberName,
@@ -221,8 +254,12 @@ watch(
     activeTab.value = 'profile';
     thoughtExpanded.value = false;
     broken.value = false;
+    glassOpen.value = false;
+    cancelPortraitHover();
   },
 );
+
+onBeforeUnmount(cancelPortraitHover);
 
 const memberData = computed(() => {
   const roster = asRecord(_.get(store.data, '成员名册', {}));

@@ -28,7 +28,16 @@
 
         <section v-if="detail" class="roster-detail">
           <div class="detail-hero">
-            <div class="detail-portrait" :class="{ 'is-broken': broken.has(detail.name) }">
+            <button
+              type="button"
+              class="detail-portrait cursor-zoom-in"
+              :class="{ 'is-broken': broken.has(detail.name) }"
+              :title="`查看 ${detail.name} 立体立绘`"
+              :aria-label="`放大查看 ${detail.name} 立绘`"
+              @click="openGlassLightbox"
+              @mouseenter="onPortraitHover"
+              @mouseleave="cancelPortraitHover"
+            >
               <PortraitImage
                 :candidates="detail.srcs"
                 :alt="detail.name"
@@ -36,7 +45,7 @@
                 @loaded="broken.delete(detail.name)"
               />
               <div class="portrait-fallback">{{ detail.name }}</div>
-            </div>
+            </button>
             <div class="detail-identity">
               <div class="detail-name">
                 {{ detail.name }}
@@ -130,6 +139,12 @@
         <section v-else class="roster-detail roster-empty-detail">选择左侧成员查看详情</section>
       </div>
     </div>
+
+    <PortraitGlassLightbox
+      v-model:open="glassOpen"
+      :candidates="glassCandidates"
+      :alt="detail?.name || ''"
+    />
   </div>
 </template>
 
@@ -139,6 +154,7 @@ import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
 import { asRecord, formatMoney, isPresent, resolvePortraitCandidates, toPercent } from '../utils';
 import InventoryGrid from './InventoryGrid.vue';
+import PortraitGlassLightbox from './PortraitGlassLightbox.vue';
 import PortraitImage from './PortraitImage.vue';
 
 const props = defineProps<{ focusName?: string | null }>();
@@ -149,6 +165,28 @@ const { settings } = storeToRefs(useSettingsStore());
 const keyword = ref('');
 const selected = ref(props.focusName || '');
 const broken = reactive(new Set<string>());
+const glassOpen = ref(false);
+let hoverOpenTimer: ReturnType<typeof setTimeout> | null = null;
+
+function openGlassLightbox() {
+  if (!detail.value || broken.has(detail.value.name)) return;
+  glassOpen.value = true;
+}
+
+function onPortraitHover() {
+  if (hoverOpenTimer) clearTimeout(hoverOpenTimer);
+  // 悬停稍作停留再打开，避免扫过时误触
+  hoverOpenTimer = setTimeout(() => openGlassLightbox(), 420);
+}
+
+function cancelPortraitHover() {
+  if (hoverOpenTimer) {
+    clearTimeout(hoverOpenTimer);
+    hoverOpenTimer = null;
+  }
+}
+
+onBeforeUnmount(cancelPortraitHover);
 
 watch(
   () => props.focusName,
@@ -222,11 +260,22 @@ const detail = computed(() => {
     portraitMain: String(_.get(d, '立绘状态.主类型', '日常')),
     portraitSub: String(_.get(d, '立绘状态.次类型', '普通')),
     srcs: resolvePortraitCandidates(m.name, _.get(d, '立绘状态', {}), 'card'),
+    fullSrcs: resolvePortraitCandidates(m.name, _.get(d, '立绘状态', {}), 'full'),
     body,
     outfit: (['上衣', '下装', '袜', '鞋', '配饰'] as const)
       .map(k => String(outfitObj[k] || ''))
       .filter(v => v && v !== '待初始化'),
     bag,
   };
+});
+
+const glassCandidates = computed(() => detail.value?.fullSrcs || detail.value?.srcs || []);
+
+watch(selected, () => {
+  glassOpen.value = false;
+  if (hoverOpenTimer) {
+    clearTimeout(hoverOpenTimer);
+    hoverOpenTimer = null;
+  }
 });
 </script>
