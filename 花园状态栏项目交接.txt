@@ -1,326 +1,694 @@
 花园状态栏项目交接
+
 更新时间：2026-08-12
-当前推荐钉死 commit：5472db2（origin/main；3D 玻璃浮层 + 名册主题化 + 交接更新）
+
+当前推荐钉死 commit：8b3714c（origin/main；手机端自适应 + 收起空白修复 + 玻璃浮层触控）
+
 功能基线 commit：ec75079（背包格子 / 立绘锁定 / Header 氛围 / 在场拖动点击修复 / 神无咲立绘）
+
 本地仓库：e:\tavern_helper_template-main → origin https://github.com/enfermilei/huayuan
 
-================================================================================
-0. 新会话 60 秒上手
+
+
 ================================================================================
 
-1. git pull；确认 HEAD（应接近 5472db2）
+0. 新会话 60 秒上手
+
+================================================================================
+
+
+
+1. git pull；确认 HEAD（应接近 8b3714c）
+
 2. 本地：pnpm watch + pnpm serve:cors
+
    正则「测试」→ http://127.0.0.1:5500/dist/花园/界面/状态栏/index.html
+
 3. 启用脚本：花园 MVU、花园变量结构；关 CDN「mvu美化」防双开
+
 4. 酒馆助手 → 实时监听 → 允许监听
+
 5. 快速验：
+
    - 顶部胶囊：天气/时段图标与微动效；深夜 Header 变暗
+
    - 在场卡：滚轮横滑 + 拖动；点按仍能开身份卡
+
    - 好感/忠诚条长度 ≈ 数字（0~100）
+
    - 底栏：名册 / 地图 / 背包 / 设置
+
    - 设置：安全模式、自定义立绘、立绘锁定、主题色
+
    - 角色档案显示 {{user}} 名；名册/身份卡立绘可点开 3D 玻璃浮层
+
    - 切换主题后名册/弹层背景应跟色（非写死桃色）
+
+   - 手机/窄气泡（iframe≈250px）：天气条文案完整、底栏 2×2 可读、收起后无大片空白
+
 6. 发卡钉 @commit，禁止 @main（见 §10）
 
 
+
+
+
 ================================================================================
+
 1. 项目是什么
+
 ================================================================================
+
+
 
 基于酒馆助手模板，给角色卡「在满是数删的神秘组织里当主人」做的 MVU 状态栏前端。
 
+
+
 项              内容
+
 --------------  --------------------------------------------------------------
+
 本地仓库        e:\tavern_helper_template-main
+
 业务代码        src/花园/
+
 GitHub          https://github.com/enfermilei/huayuan（origin）
+
 技术栈          Vue 3 + Pinia + Zod 4 + Tailwind(可用) + 酒馆助手 API + MVU
+
 运行形态        消息楼层 iframe 前端（禁止核心逻辑回退到正则 inline <script>）
+
 设定方向        花园组织经营 / 成员管理 / 赌场·酒馆 / 庄园地图等
+
 展示内容        世界氛围条、角色档案({{user}})、组织、在场成员(立绘)、名册、地图、背包、设置
 
 
+
+
+
 ================================================================================
+
 2. 关键背景（为何是 iframe）
+
 ================================================================================
+
+
 
 旧方案：整份 HTML（含 <script>）进酒馆正则。
+
 根因：SillyTavern innerHTML 注入时 <script> 不执行 → 界面停在 -- / 同步中...
+
 验证：DOM 有 init 源码字符串，但 typeof init === 'undefined'。
 
+
+
 现方案：酒馆助手 iframe；视觉在 CSS/Vue，逻辑在 TS。
+
 正则只做占位 → $('body').load(状态栏 URL)。
 
 
+
+
+
 ================================================================================
+
 3. 目录结构（状态栏相关）
+
 ================================================================================
+
+
 
 src/花园/
+
   schema.ts / schema.json         # MVU zod；build/watch 生成 json
+
   世界书/index.yaml
+
   脚本/
+
     MVU/index.ts                  # 包装 MagVarUpdate（先绑 Vue 全局常量）
+
     变量结构/index.ts             # registerMvuSchema(Schema)
+
   界面/状态栏/
+
     index.html / index.ts         # 占位 → wait Mvu/stat_data(120s) → Pinia
+
                                   # → 自定义立绘 init → mount
-    App.vue                       # 布局 + 弹层（名册/地图/背包/设置/身份卡）
+
+    App.vue                       # 布局 + 弹层；窄屏折叠后写回 iframe 高度
+
     store.ts                      # defineMvuDataStore 楼层双向同步
+
     settings.ts / theme.ts        # UI 设置 + 主题 token → CSS 变量
+
     portrait.ts                   # 立绘规范化、别名、多 CDN 候选 URL
+
     portraitLocks.ts              # 立绘锁定（忽略后续 MVU 立绘状态）
+
     customPortraits.ts            # 自定义立绘 IndexedDB + 压缩
+
     inventory.ts                  # 背包解析/分类/重要标记
+
     worldAtmosphere.ts            # 天气/时段/温度/Header 氛围（纯 CSS，无 emoji）
+
     utils.ts                      # resolvePortraitCandidates 等
+
     mapData.ts / customLandmarks.ts
-    global.css                    # 含弹层/名册主题化背景
+
+    global.css                    # 弹层/名册主题化；≤720/420 手机自适应 + container query
+
     components/
-      WorldHeader                 # 五胶囊 + 氛围微动效
+
+      WorldHeader                 # 五胶囊 + 氛围微动效；点击折叠主面板
+
       UserPanel                   # 角色档案（标题）；名字用 {{user}}/name1
+
       OrgPanel / CharacterList / ActionBar
+
       RosterPanel / MapPanel / SettingsPanel / IdentityCard
+
       PortraitImage               # 候选 URL 失败时依次回退
+
       PortraitGlassLightbox       # 3D 视差玻璃浮层（名册 + 身份卡共用）
+
       InventoryGrid / InventoryPanel / LandmarkGlyph
 
+
+
 portraits/{角色名}/*.png          # 约定 832×1216；见 §6 角色清单
+
 scripts/cors-static-server.js     # pnpm serve:cors → :5500
+
 dist/花园/...                     # 打包产物（[bot] bundle 会改）
 
 
-================================================================================
-4. 已完成功能（按阶段）
+
+
+
 ================================================================================
 
+4. 已完成功能（按阶段）
+
+================================================================================
+
+
+
 阶段  内容
+
 ----  ----------------------------------------------------------------------
+
 0-2   正则 script 根因；Vue iframe；Schema + defineMvuDataStore
+
 3-5   名册；设置（想法/动画/名册优先在场）
+
 6-10  立绘匹配；发布；pinia 白屏修复；子目录 URL；启动 120s 超时
+
 11-12 立绘资源；在场 832×1216 contain，忠诚栏不被裁
+
 13-15 设置精简；安全模式；自定义立绘（IndexedDB）
+
 16    好感/忠诚进度条与数字 0~100 一致
+
 17    背包格子：分类、角标「重」、详情；底栏「背包」；档案区去掉背包
+
 18    立绘锁定（身份卡 / 设置列表）
+
 19    在场横滑 + 拖动；拖动与点击手势分离（ec75079 起）
+
 20    WorldHeader：按天气/时段换纯 CSS 图标 + 微动效；深夜压暗
+
 21    地图增强：滚轮缩放、拖拽平移、区域筛选、主宅室内分层、自定义地标
+
 22    立绘扩容：神无咲、雪之下琴音、白石响子、莉莉露、恋音等
+
 23    主题色预设 + 自定义主色；弹层/名册背景跟 --theme-*（勿写死桃色）
+
 24    角色档案文案：主人档案→角色档案；主角→{{user}}
+
 25    立绘多 CDN / 文件名别名候选（普通↔正常、疑惑↔困惑）+ PortraitImage 回退
+
 26    3D 视差玻璃浮层：名册详情立绘 + 身份卡左侧立绘
-      - 点击或悬停约 0.4s 打开；离开玻璃舞台自动关；Esc/点遮罩可关
+
+      - 点击打开；桌面可悬停约 0.4s 打开；Esc/点遮罩/关闭钮可关
+
+      - 触控：不启用「移出舞台即关」；不启用悬停自动开
+
       - 倾角相对未旋转舞台计算 + rAF 阻尼；最大约 ±7°
-      - 预览接近 94vh
+
+      - 尺寸相对浮层 %（避免宿主 vh 撑破 iframe）
+
+27    手机/窄气泡自适应（8b3714c）
+
+      - #garden-mvu-root container-type；@media/@container ≤720 / ≤420
+
+      - 天气条 2 列网格（TEMP 通栏），避免 DATE→DA 截断
+
+      - 底栏 2×2；身份卡 Tab nowrap；主面板单列、内容撑开
+
+      - 收起：窄屏不用 height:0↔var(--fold-h) 过渡（易卡死留白）；
+
+        改为 height:auto / 瞬时 height:0，并写回 frameElement.style.height
+
+
 
 本地 CORS：必须 pnpm serve:cors（勿用无 CORS 的 Live Server 占 5500）
 
 
+
+
+
 ================================================================================
+
 5. Schema 摘要
+
 ================================================================================
+
+
 
 stat_data：
+
   系统      日期/时间/星期/天气/温度；组织全局；金缕赌场；迷迭香酒馆
+
             （UI 可读 系统.时段；无则用 时间推断氛围）
+
   成员名册  职务、位置、好感、忠诚、目标、身体、着装、怀孕、立绘、在场、背包…
+
   主角      职务、位置、贡献、资金、着装、背包（数据字段名仍为「主角」）
 
+
+
 注意：
+
 - 好感/忠诚：schema clamp -100~100；进度条 UI 用 abs → 0~100%
+
 - 是否在场：z.boolean()；UI isPresent 兼容 'true'/1
+
 - 立绘：日常|服装|性事 + 次类型校验 + 差分 1|2；别名见 portrait.ts / schema
+
 - 背包：{ 描述, 数量 }；数量≤0 会被 transform 去掉
 
 
+
+
+
 ================================================================================
+
 6. 立绘约定与资源清单
+
 ================================================================================
+
+
 
 路径：
+
   portraits/{角色名}/{角色名}-{主类型}-{次类型}-{差分}.png
+
 例：portraits/天音纯/天音纯-日常-普通-1.png
 
+
+
 角色目录（持续扩容，以仓库 portraits/ 为准）：
+
   天音纯 / 天野神乐 / 夏语冰 / 神无咲 / 雪之下琴音 / 白石响子 / 莉莉露 / 恋音 / …
 
+
+
 resolvePortraitCandidates 优先级：
+
   1) 本机锁定（portraitLocks）
+
   2) 安全模式且 R18 → 日常-普通-1
+
   3) 自定义立绘 IndexedDB（含文件名别名键）
+
   4) 官方 CDN 多源 × 文件名变体（普通/正常、疑惑/困惑…）
+
   5) placehold
+
   调用方：PortraitImage 在 @error 时依次尝试下一候选
 
+
+
 CDN 基址（portrait.ts PORTRAIT_CDN_BASES）：
+
   testingcf.jsdelivr / cdn.jsdelivr / raw.githubusercontent（立绘资源可用 @main）
+
+
 
 R18（安全模式隐藏）：主类型=性事；或 服装+裸体
 
+
+
 锁定：localStorage garden-mvu:portrait-locks
+
   入口：身份卡「锁定/解锁立绘」；设置可批量清除
+
   注意：锁定后再套安全模式——锁定 R18 仍可能被安全模式盖成日常
 
+
+
 在场卡：宽约 280px；立绘区 aspect-ratio 832/1216；object-fit:contain；
+
 给 card-body 留高，避免裁切好感/忠诚栏。
 
 
-================================================================================
-7. 背包约定
+
+
+
 ================================================================================
 
+7. 背包约定
+
+================================================================================
+
+
+
 - 格子 + 自动分类（文件/钥匙/消耗/装备/贵重/其他）
+
 - 重要角标「重」（机密/合同/钥匙…）
+
 - 点击展开描述（无复制按钮）
+
 - 入口：底栏「背包」（主角数据）；身份卡/名册随身（成员 compact）
+
 - 角色档案面板不再内嵌背包
 
 
-================================================================================
-8. 设置项（garden-mvu:ui-settings）
+
+
+
 ================================================================================
 
+8. 设置项（garden-mvu:ui-settings）
+
+================================================================================
+
+
+
 - 显示内心想法摘要
+
 - 入场动画
+
 - 名册优先在场
+
 - 安全模式（默认 false）
+
 - 主题颜色（亮色：暖桃/薄荷/晴空/丁香/蔷薇/琥珀；暗色：夜桃/墨蓝/青墨/余烬；自定义主色+暗色底开关）
+
 - 自定义立绘管理 / 立绘锁定列表
+
 - 「恢复默认」只重置开关与主题；不清 IndexedDB 立绘、不清锁定（锁定单独清）
+
+- mainExpanded：主面板展开/收起（点 WorldHeader 切换）
+
+
 
 已移除：立绘资源基址、立绘扩展名
 
 
+
+
+
 ================================================================================
+
 9. 本地开发 vs 发卡
+
 ================================================================================
+
+
 
 【本地】
+
   pnpm watch
+
   pnpm serve:cors
+
   酒馆 http://127.0.0.1:1234/
+
   实时监听开；脚本：花园 MVU + 花园变量结构
+
   正则「测试」→ http://127.0.0.1:5500/dist/花园/界面/状态栏/index.html
+
   关 CDN「mvu美化」
 
+
+
 【发卡】
+
   镜像：testingcf.jsdelivr.net（勿 raw.githubusercontent.com 作状态栏包）
+
   必须钉 commit，禁止 @main
 
+
+
   当前推荐：
+
     状态栏：
-      https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@5472db2/dist/花园/界面/状态栏/index.html
+
+      https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@8b3714c/dist/花园/界面/状态栏/index.html
+
     MVU：
-      import 'https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@5472db2/dist/花园/脚本/MVU/index.js';
+
+      import 'https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@8b3714c/dist/花园/脚本/MVU/index.js';
+
+
 
   立绘资源根（可用 @main）：
+
     https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@main/portraits
 
+
+
 正则示例：
+
 ```
+
 <body>
+
   <script>
+
     $('body').load(
-      'https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@5472db2/dist/花园/界面/状态栏/index.html',
+
+      'https://testingcf.jsdelivr.net/gh/enfermilei/huayuan@8b3714c/dist/花园/界面/状态栏/index.html',
+
     );
+
   </script>
+
 </body>
+
 ```
-有新推送后，把 @5472db2 换成新 commit。角色卡内「mvu美化」与「测试」勿同时开。
+
+有新推送后，把 @8b3714c 换成新 commit。角色卡内「mvu美化」与「测试」勿同时开。
+
+
+
 
 
 ================================================================================
+
 10. 关键事故（务必读）
+
 ================================================================================
+
+
 
 A. pinia@4 白屏
+
    unpinned pinia/+esm → 缺 __VUE_PROD_DEVTOOLS__
+
    已修：webpack 钉 pinia@3.0.4；index.html 注入全局常量；MVU 包装脚本
+
    禁止角色卡裸 import MagVarUpdate/artifact/bundle.js
 
+
+
 B. @main 缓存坏包
+
    jsDelivr @main 可能仍是旧/坏包 → 发卡永远钉 @commit
 
+
+
 C. [bot] bundle 覆盖 dist
+
    合并/pull 后核对状态栏包；UI 大改后重新钉新 commit
+
    本地若 behind origin 的 bot bundle，先 pull 再测
 
+
+
 D. 状态栏不显示
+
    消息/当前 swipe 必须含 <StatusPlaceHolderImpl/>，否则正则不注入 iframe
+
    开场白 first_mes 若缺占位符，第 0 楼也会空白；切到带占位符的 swipe 可验证
+
    本地实时监听依赖 ws://localhost:6621（需 pnpm watch）
 
 
+
+E. 手机收起后大片空白（已修于 8b3714c）
+
+   根因：窄屏曾用 height:0↔var(--fold-h) 过渡，Chromium 易卡死；
+
+   且 iframe style.height 未随折叠收缩
+
+   现：窄屏 height:auto / 瞬时 0 + bumpHostFrameResize 写回 frameElement
+
+
+
+
+
 ================================================================================
+
 11. 后续目标
+
 ================================================================================
+
+
 
 P0
-  [ ] 卡内正则钉最新 HEAD 并保存角色卡
+
+  [ ] 卡内正则钉最新 HEAD（8b3714c）并保存角色卡
+
   [ ] first_mes / 各开场 swipe 统一补 <StatusPlaceHolderImpl/>
+
   [ ] Schema 非法/缺字段时 UI 不刷新的防护与提示
+
   [ ] jsDelivr 长期钉 tag/commit；少用 @main
 
+
+
 P1
+
   [ ] 名册筛选/排序/危险置顶
+
   [ ] 地图继续打磨（探索玩法、更多交互）
+
   [ ] 设置/锁定/自定义立绘同步到角色卡或脚本变量（现仅本机）
 
+
+
 P2
+
   [ ] 名册可操作、地图更深探索
+
 P3
+
   [x] 主题颜色（设置内预设 + 自定义主色）
+
   [x] 3D 视差玻璃浮层（名册 + 身份卡）
+
+  [x] 手机/窄气泡自适应 + 收起空白修复
+
   [ ] 紧凑模式/经营摘要/关系网
 
 
+
+
+
 ================================================================================
+
 12. 已知坑
+
 ================================================================================
+
+
 
 问题                    说明
+
 ----------------------  ------------------------------------------------------
+
 CORS                    本地必须 pnpm serve:cors
+
 pinia CDN               禁止 unpinned pinia/+esm
+
 MagVarUpdate 裸 import  用仓库包装 MVU index.js
+
 jsDelivr @main          发卡禁用；立绘资源根可用
+
 [bot] bundle            可能冲 dist；pull 后看状态栏是否仍正常
+
 defineMvuDataStore      parse 失败会跳过同步
+
 立绘路径                必须含角色子目录
+
 进度条                  与数字 0~100 一致；勿擅自改回 (v+100)/2
+
 安全模式 vs 锁定        先锁定态，再套安全模式
+
 自定义/锁定             本机存储，换浏览器会丢
+
 在场手势                拖动超过阈值后不触发点按；点按才开身份卡
+
 角色档案                无背包；背包走底栏；UI 文案非「主人档案」
+
 双正则                  「测试」与「mvu美化」只开一个
+
 async-wait-until        状态栏显式 120s（库默认仅 5s）
+
 StatusPlaceHolder       AI/开场漏写则整栏不渲染
+
 玻璃浮层倾角            必须相对未旋转舞台算坐标，勿用旋转后 card.getBoundingClientRect
+
 名册主题                选中项/立绘底等须用 --theme-*，勿写死 #ffe8d6 桃色
 
+窄屏折叠                勿对 main-body 做 height:0↔var(--fold-h) 过渡；会卡死留白
+
+窄屏布局                勿再强制 main-body-surface 的 16/10.2；单列必须内容撑开
+
+panel-title sticky      窄屏「在场成员」须 position:static，否则会盖住角色档案
+
+iframe 高度             折叠/展开后需写回 frameElement.style.height（App bumpHostFrameResize）
+
+
+
+
 
 ================================================================================
+
 13. 关键 commit
+
 ================================================================================
+
+
 
 ef4369c   MVU 包装 + 全局常量
+
 9e333c3   立绘子目录 + 启动占位
+
 ec75079   背包格子、立绘锁定、Header 氛围、在场点击修复  ← 功能基线
+
 429eb2a   早期推荐钉（已过时，勿再默认用）
+
 09b5706   立绘多 CDN 回退；角色档案显示 {{user}}
+
 53e30e1   [bot] bundle
-5472db2   3D 玻璃浮层（名册+身份卡）+ 名册/弹层主题化 + 交接文档  ← 当前推荐钉
+
+5472db2   3D 玻璃浮层（名册+身份卡）+ 名册/弹层主题化 + 交接文档
+
+462dd01   [bot] bundle
+
+8b3714c   手机端自适应 + 收起空白修复 + 玻璃浮层触控  ← 当前推荐钉
+
+
+
 
 
 ================================================================================
+
 14. localStorage / IndexedDB
+
 ================================================================================
 
-garden-mvu:ui-settings              设置开关
+
+
+garden-mvu:ui-settings              设置开关（含 mainExpanded）
+
 garden-mvu:portrait-locks           立绘锁定表
+
 IndexedDB garden-mvu-portraits      自定义立绘 Blob（store: images）
+
 （地图自定义地标等若有本地存储，见 customLandmarks.ts）
+

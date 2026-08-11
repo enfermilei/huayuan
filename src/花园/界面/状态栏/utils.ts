@@ -140,3 +140,20 @@ export function asRecord(value: unknown): Record<string, any> {
   }
   return {};
 }
+
+export const OUTFIT_SLOTS = ['上衣', '下装', '袜', '鞋', '配饰'] as const;
+export type OutfitSlot = (typeof OUTFIT_SLOTS)[number];
+
+export type OutfitChip = {
+  slot: OutfitSlot;
+  text: string;
+};
+
+/** 从着装对象抽出有内容的条目（保留槽位以便画图标） */
+export function parseOutfitChips(outfit: unknown): OutfitChip[] {
+  const obj = asRecord(outfit);
+  return OUTFIT_SLOTS.map(slot => ({
+    slot,
+    text: String(obj[slot] || ''),
+  })).filter(item => item.text && item.text !== '待初始化');
+}

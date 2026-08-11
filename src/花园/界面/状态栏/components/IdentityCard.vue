@@ -159,9 +159,21 @@
               <template v-else>
                 <div class="id-section">
                   <div class="sub-section-title">今日着装</div>
-                  <div class="outfit-row">
-                    <span v-for="chip in detail.outfit" :key="chip" class="outfit-chip">{{ chip }}</span>
-                    <span v-if="detail.outfit.length === 0" class="outfit-chip" style="opacity: 0.6">暂无穿戴</span>
+                  <div class="outfit-list">
+                    <div
+                      v-for="chip in detail.outfit"
+                      :key="chip.slot"
+                      class="outfit-item"
+                      :data-slot="chip.slot"
+                    >
+                      <span class="gear-icon-slot" aria-hidden="true">
+                        <OutfitGlyph :slot="chip.slot" />
+                      </span>
+                      <span class="outfit-item-text">{{ chip.text }}</span>
+                    </div>
+                    <div v-if="detail.outfit.length === 0" class="outfit-item is-empty">
+                      <span class="outfit-item-text">暂无穿戴</span>
+                    </div>
                   </div>
                 </div>
                 <div class="id-section">
@@ -202,8 +214,9 @@ import { isR18Portrait, normalizePortraitState } from '../portrait';
 import { usePortraitLocksStore } from '../portraitLocks';
 import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
-import { asRecord, formatMoney, isPresent, resolvePortraitCandidates, toPercent } from '../utils';
+import { asRecord, formatMoney, isPresent, parseOutfitChips, resolvePortraitCandidates, toPercent } from '../utils';
 import InventoryGrid from './InventoryGrid.vue';
+import OutfitGlyph from './OutfitGlyph.vue';
 import PortraitGlassLightbox from './PortraitGlassLightbox.vue';
 import PortraitImage from './PortraitImage.vue';
 
@@ -313,9 +326,7 @@ const detail = computed(() => {
     portraitLocked: locked,
     srcs: resolvePortraitCandidates(props.memberName, portrait, 'full'),
     body,
-    outfit: (['上衣', '下装', '袜', '鞋', '配饰'] as const)
-      .map(k => String(outfitObj[k] || ''))
-      .filter(v => v && v !== '待初始化'),
+    outfit: parseOutfitChips(outfitObj),
     bag,
     goals: [
       { label: '短期目标', text: String(_.get(d, '短期目标', '无')) },

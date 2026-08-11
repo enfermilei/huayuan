@@ -26,21 +26,48 @@
         <span class="data-value">{{ loc }}</span>
       </div>
     </div>
-    <div class="user-outfit">
-      <span class="data-label">今日着装</span>
-      <div class="outfit-row">
-        <span v-for="chip in outfitChips" :key="chip" class="outfit-chip">{{ chip }}</span>
-        <span v-if="outfitChips.length === 0" class="outfit-chip" style="opacity: 0.6">暂无穿戴</span>
+    <div class="user-outfit" :class="{ 'is-expanded': settings.outfitExpanded }">
+      <button
+        class="outfit-toggle"
+        type="button"
+        :aria-expanded="settings.outfitExpanded"
+        aria-controls="user-outfit-list"
+        @click="settings.outfitExpanded = !settings.outfitExpanded"
+      >
+        <span class="data-label">今日着装</span>
+        <span class="outfit-toggle-meta">{{ outfitSummary }}</span>
+        <span class="outfit-toggle-chevron" aria-hidden="true"></span>
+      </button>
+      <div id="user-outfit-list" class="outfit-list-fold" :hidden="!settings.outfitExpanded">
+        <div class="outfit-list">
+          <div
+            v-for="chip in outfitChips"
+            :key="chip.slot"
+            class="outfit-item"
+            :data-slot="chip.slot"
+          >
+            <span class="gear-icon-slot" aria-hidden="true">
+              <OutfitGlyph :slot="chip.slot" />
+            </span>
+            <span class="outfit-item-text">{{ chip.text }}</span>
+          </div>
+          <div v-if="outfitChips.length === 0" class="outfit-item is-empty">
+            <span class="outfit-item-text">暂无穿戴</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>
 </template>
 
 <script setup lang="ts">
+import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
-import { formatMoney } from '../utils';
+import { formatMoney, parseOutfitChips } from '../utils';
+import OutfitGlyph from './OutfitGlyph.vue';
 
 const store = useDataStore();
+const { settings } = storeToRefs(useSettingsStore());
 
 const userName = computed(() => {
   try {
@@ -59,9 +86,10 @@ const subtitle = computed(() => `${role.value} · ${loc.value}`);
 const fund = computed(() => formatMoney(_.get(store.data, '主角.资金', 0)));
 const contrib = computed(() => (Number(_.get(store.data, '主角.贡献度', 0)) || 0).toLocaleString('en-US'));
 
-const outfitChips = computed(() =>
-  (['上衣', '下装', '袜', '鞋', '配饰'] as const)
-    .map(k => String(_.get(store.data, `主角.着装.${k}`, '') || ''))
-    .filter(v => v && v !== '待初始化'),
-);
+const outfitChips = computed(() => parseOutfitChips(_.get(store.data, '主角.着装', {})));
+const outfitSummary = computed(() => {
+  const n = outfitChips.value.length;
+  if (n === 0) return '暂无';
+  return settings.value.outfitExpanded ? `${n} 项 · 收起` : `${n} 项 · 展开`;
+});
 </script>

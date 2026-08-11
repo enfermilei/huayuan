@@ -22,6 +22,8 @@ const Settings = z
     rosterPreferPresent: z.boolean().prefault(true),
     /** 主面板展开：点顶部氛围条可收起，默认展开 */
     mainExpanded: z.boolean().prefault(true),
+    /** 角色档案「今日着装」展开；默认收起，避免挤掉组织概况 */
+    outfitExpanded: z.boolean().prefault(false),
     /** 安全模式：隐藏性事/裸体等 R18 立绘，回退到日常-普通 */
     safeMode: z.boolean().prefault(false),
     /** 主题预设；custom 时使用 themeAccent / themeDark */
