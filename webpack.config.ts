@@ -126,6 +126,37 @@ function dump_schema(compiler: webpack.Compiler) {
   }
 }
 
+/**
+ * production + outputModule 时，内联后的模块可能只剩 `__webpack_require__.cjs=...`
+ * 却没有声明 `__webpack_require__`，一执行就 ReferenceError → 状态栏白屏。
+ */
+function fix_webpack_require_runtime(compiler: webpack.Compiler) {
+  const patch = (source: string) => {
+    if (!source.includes('__webpack_require__.cjs')) return source;
+    if (/(?:var|let|const|function)\s+__webpack_require__\b/.test(source)) return source;
+    return source.replace(
+      /__webpack_require__\.cjs\s*=/,
+      'var __webpack_require__={};__webpack_require__.cjs=',
+    );
+  };
+
+  compiler.hooks.afterEmit.tap('FixWebpackRequireRuntimeAfterEmit', compilation => {
+    const outDir = compilation.outputOptions.path;
+    if (!outDir) return;
+    for (const name of Object.keys(compilation.assets)) {
+      if (!name.endsWith('.html') && !name.endsWith('.js')) continue;
+      const file = path.join(outDir, name);
+      if (!fs.existsSync(file)) continue;
+      const source = fs.readFileSync(file, 'utf8');
+      const next = patch(source);
+      if (next !== source) {
+        fs.writeFileSync(file, next, 'utf8');
+        console.info('\x1b[36m[webpack_require_fix]\x1b[0m patched ' + name);
+      }
+    }
+  });
+}
+
 let child_process: ChildProcess;
 function watch_tavern_sync(compiler: webpack.Compiler) {
   if (!compiler.options.watch) {
@@ -432,6 +463,7 @@ function parse_configuration(entry: Entry): (_env: any, argv: any) => webpack.Co
         { apply: watch_tavern_helper },
         { apply: dump_schema },
         { apply: watch_tavern_sync },
+        { apply: fix_webpack_require_runtime },
         new VueLoaderPlugin(),
         unpluginAutoImport({
           dts: true,
