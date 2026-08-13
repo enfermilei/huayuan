@@ -148,12 +148,7 @@
               </template>
 
               <template v-else-if="activeTab === 'body'">
-                <div class="id-body-grid">
-                  <div v-for="(v, k) in detail.body" :key="k" class="id-body-cell" :class="{ alert: isBodyAlert(v) }">
-                    <span class="id-body-key">{{ k }}</span>
-                    <span class="id-body-val">{{ v }}</span>
-                  </div>
-                </div>
+                <BodyStatusPanel :body="detail.body" />
               </template>
 
               <template v-else>
@@ -210,6 +205,7 @@ import { usePortraitLocksStore } from '../portraitLocks';
 import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
 import { asRecord, formatMoney, isPresent, parseOutfitChips, resolvePortraitCandidates, toPercent } from '../utils';
+import BodyStatusPanel from './BodyStatusPanel.vue';
 import InventoryGrid from './InventoryGrid.vue';
 import OutfitGlyph from './OutfitGlyph.vue';
 import PortraitGlassLightbox from './PortraitGlassLightbox.vue';
@@ -373,10 +369,5 @@ async function onPortraitFile(ev: Event) {
     console.error('[花园状态栏] 身份卡上传立绘失败', error);
     toastr.error('立绘上传失败');
   }
-}
-
-function isBodyAlert(value: unknown): boolean {
-  const s = String(value || '');
-  return /伤|痛|破|肿|炎|血|危|异常|不适|撕裂/.test(s);
 }
 </script>

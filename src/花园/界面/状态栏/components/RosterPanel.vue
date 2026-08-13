@@ -118,9 +118,7 @@
 
           <div class="detail-block">
             <div class="sub-section-title">身体状况</div>
-            <div class="outfit-row">
-              <span v-for="(v, k) in detail.body" :key="k" class="outfit-chip">{{ k }}：{{ v }}</span>
-            </div>
+            <BodyStatusPanel :body="detail.body" />
           </div>
 
           <div class="detail-block">
@@ -156,6 +154,7 @@ import { parseInventory } from '../inventory';
 import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
 import { asRecord, formatMoney, isPresent, parseOutfitChips, resolvePortraitCandidates, toPercent } from '../utils';
+import BodyStatusPanel from './BodyStatusPanel.vue';
 import InventoryGrid from './InventoryGrid.vue';
 import OutfitGlyph from './OutfitGlyph.vue';
 import PortraitGlassLightbox from './PortraitGlassLightbox.vue';
