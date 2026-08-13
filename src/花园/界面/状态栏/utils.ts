@@ -9,9 +9,20 @@ import {
 import { usePortraitLocksStore } from './portraitLocks';
 import { DEFAULT_PORTRAIT_EXT, useSettingsStore } from './settings';
 
+/** MVU 用 -1 表示尚未初始化 / 未知 */
+export function isUnknownStat(n: unknown): boolean {
+  return Number(n) === -1;
+}
+
 export function formatMoney(n: unknown): string {
+  if (isUnknownStat(n)) return '未知';
   const num = Number(n) || 0;
   return `￥${num.toLocaleString('en-US')}`;
+}
+
+export function formatNumber(n: unknown): string {
+  if (isUnknownStat(n)) return '未知';
+  return (Number(n) || 0).toLocaleString('en-US');
 }
 
 /** 好感/忠诚数值为 -100~100；进度条按 0~100 展示（与数字观感一致，负值用绝对值） */

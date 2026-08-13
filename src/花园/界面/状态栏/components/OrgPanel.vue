@@ -62,12 +62,12 @@
 
 <script setup lang="ts">
 import { useDataStore } from '../store';
-import { asRecord, formatMoney, statusDotClass } from '../utils';
+import { asRecord, formatMoney, formatNumber, isUnknownStat, statusDotClass } from '../utils';
 
 const store = useDataStore();
 
 const orgFund = computed(() => formatMoney(_.get(store.data, '系统.组织全局.总资金', 0)));
-const orgRep = computed(() => (Number(_.get(store.data, '系统.组织全局.组织声望', 0)) || 0).toLocaleString('en-US'));
+const orgRep = computed(() => formatNumber(_.get(store.data, '系统.组织全局.组织声望', 0)));
 
 const casinoStatus = computed(() => String(_.get(store.data, '系统.金缕赌场.经营状况', '待初始化')));
 const barStatus = computed(() => String(_.get(store.data, '系统.迷迭香酒馆.经营状况', '待初始化')));
@@ -75,7 +75,11 @@ const casinoDot = computed(() => statusDotClass(casinoStatus.value));
 const barDot = computed(() => statusDotClass(barStatus.value));
 
 function profitView(path: string) {
-  const v = Number(_.get(store.data, path, 0)) || 0;
+  const raw = _.get(store.data, path, 0);
+  if (isUnknownStat(raw)) {
+    return { text: '未知', cls: '' };
+  }
+  const v = Number(raw) || 0;
   return {
     text: `${formatMoney(Math.abs(v))} 本周`,
     cls: v > 0 ? 'text-profit-up' : v < 0 ? 'text-profit-down' : '',
