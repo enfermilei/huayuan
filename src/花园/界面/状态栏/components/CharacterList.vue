@@ -66,10 +66,10 @@
 </template>
 
 <script setup lang="ts">
-import PortraitImage from './PortraitImage.vue';
 import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
 import { asRecord, isPresent, resolvePortraitCandidates, toPercent } from '../utils';
+import PortraitImage from './PortraitImage.vue';
 
 const emit = defineEmits<{ select: [name: string] }>();
 

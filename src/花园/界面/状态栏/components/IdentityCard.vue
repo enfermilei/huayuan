@@ -110,19 +110,19 @@
             <div :key="activeTab" class="id-card-panel" role="tabpanel">
               <template v-if="activeTab === 'profile'">
                 <div class="id-stat-grid">
-                  <div class="id-stat">
+                  <div class="id-stat is-metric" data-mark="contrib">
                     <span class="data-label">贡献度</span>
                     <span class="data-value font-mono">{{ detail.contrib }}</span>
                   </div>
-                  <div class="id-stat">
+                  <div class="id-stat is-metric" data-mark="fund">
                     <span class="data-label">资金</span>
                     <span class="data-value font-mono">{{ detail.fund }}</span>
                   </div>
-                  <div class="id-stat">
+                  <div class="id-stat" data-mark="portrait-main">
                     <span class="data-label">立绘主类型</span>
                     <span class="data-value">{{ detail.portraitMain }}</span>
                   </div>
-                  <div class="id-stat">
+                  <div class="id-stat" data-mark="portrait-sub">
                     <span class="data-label">立绘次类型</span>
                     <span class="data-value">{{ detail.portraitSub }}</span>
                   </div>
@@ -139,12 +139,7 @@
               </template>
 
               <template v-else-if="activeTab === 'goals'">
-                <div class="id-goal-list">
-                  <article v-for="g in detail.goals" :key="g.label" class="id-goal">
-                    <div class="id-goal-label">{{ g.label }}</div>
-                    <p>{{ g.text }}</p>
-                  </article>
-                </div>
+                <GoalsTimeline :goals="detail.goals" />
               </template>
 
               <template v-else-if="activeTab === 'body'">
@@ -206,6 +201,7 @@ import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
 import { asRecord, formatMoney, isPresent, parseOutfitChips, resolvePortraitCandidates, toPercent } from '../utils';
 import BodyStatusPanel from './BodyStatusPanel.vue';
+import GoalsTimeline from './GoalsTimeline.vue';
 import InventoryGrid from './InventoryGrid.vue';
 import OutfitGlyph from './OutfitGlyph.vue';
 import PortraitGlassLightbox from './PortraitGlassLightbox.vue';

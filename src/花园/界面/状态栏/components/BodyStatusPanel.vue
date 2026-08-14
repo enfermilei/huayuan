@@ -54,7 +54,9 @@
         <span class="body-veil-title">{{ part.label }}</span>
       </header>
       <div class="body-veil-secret">
-        <p class="body-veil-desc">{{ part.text }}</p>
+        <div class="status-text-content">
+          <p class="body-veil-desc">{{ part.text }}</p>
+        </div>
         <span class="body-veil-hint" aria-hidden="true"></span>
       </div>
     </article>
@@ -97,8 +99,9 @@ function onCardActivate(key: string) {
 <style scoped>
 .body-veil {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  align-items: start;
   padding: 0;
   background: transparent;
   border: none;
@@ -114,6 +117,8 @@ function onCardActivate(key: string) {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  height: 140px;
+  min-width: 0;
   padding: 12px 12px 14px;
   border-radius: 14px;
   cursor: pointer;
@@ -185,6 +190,7 @@ function onCardActivate(key: string) {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .body-veil-title {
@@ -228,15 +234,42 @@ function onCardActivate(key: string) {
 
 .body-veil-secret {
   position: relative;
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.status-text-content {
+  flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  color: #6a3b4a;
+  padding-top: 8px;
+  padding-bottom: 20px;
+}
+
+.status-text-content::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
 }
 
 .body-veil-desc {
   margin: 0;
-  font-size: 0.88rem;
+  font-size: inherit;
   font-weight: 400;
-  line-height: 1.45;
+  line-height: inherit;
   letter-spacing: 0.04em;
-  color: #4a1d29;
+  color: inherit;
   filter: blur(6px);
   opacity: 0.2;
   transition: all 0.8s cubic-bezier(0.25, 0.1, 0.25, 1);
@@ -341,9 +374,9 @@ function onCardActivate(key: string) {
 
 @media (max-width: 720px) {
   .body-veil {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, 1fr);
     padding: 0;
-    gap: 8px;
+    gap: 12px;
   }
 }
 

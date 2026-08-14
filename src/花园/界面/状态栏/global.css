@@ -2458,6 +2458,8 @@ body {
   cursor: grab;
   user-select: none;
   touch-action: pan-y pinch-zoom;
+  container-type: size;
+  container-name: char-rail;
 }
 
 #garden-mvu-root .character-list.is-dragging {
@@ -2486,8 +2488,9 @@ body {
 
 #garden-mvu-root .character-card {
   flex: 0 0 auto;
-  /* 立绘 832×1216；略收窄，给好感/忠诚栏留垂直空间 */
-  width: 280px;
+  /* 列表高度 − 信息栏，再按 832×1216 收窄，铺满立绘且不露侧边空白 */
+  --card-body-budget: 224px;
+  width: min(280px, calc((100cqh - var(--card-body-budget)) * 832 / 1216));
   height: 100%;
   max-height: 100%;
   background: var(--glass-bg-strong);
@@ -2581,30 +2584,53 @@ body {
 }
 
 #garden-mvu-root .thought-snippet {
-  font-size: 0.7rem;
-  opacity: 0.4;
+  position: relative;
+  margin-top: 4px;
+  padding: 4px 2px 10px;
+  font-size: 0.72rem;
+  font-weight: 400;
   font-style: italic;
-  color: var(--text-secondary);
-  letter-spacing: 0.2px;
-  margin-top: 2px;
+  line-height: 1.55;
+  letter-spacing: 0.04em;
+  color: #5c6370;
+  opacity: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  border: none;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0) 72%);
+  box-shadow: none;
+  -webkit-mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 55%, transparent 100%);
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.85),
+    0 0 16px rgba(255, 255, 255, 0.35);
+  animation:
+    emergeFromWater 1.2s ease-out both,
+    floatAmbient 4s ease-in-out 1.2s infinite alternate;
+  will-change: transform, filter, opacity;
+}
+
+#garden-mvu-root .thought-snippet:empty {
+  margin: 0;
+  padding: 0;
+  min-height: 0;
+  background: none;
+  -webkit-mask-image: none;
+  mask-image: none;
+  text-shadow: none;
+  animation: none;
+  will-change: auto;
 }
 
 #garden-mvu-root .portrait-area {
   position: relative;
   width: 100%;
-  /* 吃满卡片剩余高度，保证好感/忠诚栏不被挤掉；图用 cover 铺满，不再两侧露底 */
   flex: 1 1 auto;
   min-height: 0;
-  max-height: calc(100% - 168px);
+  max-height: calc(100% - 152px);
   overflow: hidden;
-  background: linear-gradient(
-    135deg,
-    color-mix(in srgb, var(--theme-btn-from) 70%, #fff),
-    color-mix(in srgb, var(--theme-accent) 35%, var(--theme-btn-to))
-  );
+  background: #fff;
   box-shadow: var(--shadow-inset-frame);
 }
 
@@ -2618,7 +2644,6 @@ body {
   display: block;
   image-rendering: auto;
   -ms-interpolation-mode: bicubic;
-  transition: transform 1.2s var(--ease-spring);
 }
 
 #garden-mvu-root .portrait-area.is-broken .portrait-fallback {
@@ -2641,8 +2666,7 @@ body {
 }
 
 #garden-mvu-root .character-card:hover .portrait-area img {
-  /* 轻微放大增强景深，cover 下仍以面部区域为锚 */
-  transform: scale(1.04);
+  transform: none;
 }
 
 #garden-mvu-root .portrait-area::after {
@@ -2650,18 +2674,18 @@ body {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  box-shadow:
-    inset 0 -30px 40px rgba(255, 253, 250, 0.6),
-    inset 0 0 24px rgba(120, 80, 60, 0.15);
+  box-shadow: inset 0 0 16px rgba(120, 80, 60, 0.08);
 }
 
 #garden-mvu-root .card-body {
-  padding: 12px 16px 14px;
+  padding: 10px 14px 12px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
   flex: 0 0 auto;
   flex-shrink: 0;
+  min-width: 0;
+  overflow: hidden;
 }
 
 #garden-mvu-root .card-identity {
@@ -2675,6 +2699,9 @@ body {
   font-weight: 800;
   color: var(--text-dark);
   letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #garden-mvu-root .char-location {
@@ -2682,6 +2709,9 @@ body {
   font-weight: 600;
   opacity: 0.5;
   letter-spacing: 0.3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #garden-mvu-root .progress-with-label {
@@ -3089,7 +3119,8 @@ body {
   }
 
   #garden-mvu-root .character-card {
-    width: min(240px, calc(100% - 8px));
+    --card-body-budget: 210px;
+    width: min(240px, calc((100cqh - var(--card-body-budget)) * 832 / 1216), calc(100% - 8px));
     flex: 0 0 auto;
   }
 
@@ -5299,7 +5330,10 @@ body {
     0 10px 26px rgba(0, 0, 0, 0.35);
 }
 
-#garden-mvu-root[data-theme-mode='dark'] .thought-snippet,
+#garden-mvu-root[data-theme-mode='dark'] .thought-snippet {
+  color: #5c6370;
+}
+
 #garden-mvu-root[data-theme-mode='dark'] .card-body,
 #garden-mvu-root[data-theme-mode='dark'] .char-meta,
 #garden-mvu-root[data-theme-mode='dark'] .roster-item,
@@ -5627,11 +5661,19 @@ body {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  padding-right: 4px;
+  padding-right: 0;
   display: flex;
   flex-direction: column;
   gap: 12px;
   animation: gmvuFadeInUp 0.35s var(--ease-spring) both;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+#garden-mvu-root .id-card-panel::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 #garden-mvu-root .id-stat-grid {
@@ -5641,48 +5683,207 @@ body {
 }
 
 #garden-mvu-root .id-stat {
-  padding: 12px 14px;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  padding: 12px 14px 14px;
   border-radius: var(--radius-md);
-  background: rgba(255, 255, 255, 0.38);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.3) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-top: 1px solid rgba(255, 255, 255, 0.92);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.78),
+    0 8px 18px rgba(120, 90, 80, 0.06);
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+#garden-mvu-root .id-stat .data-label,
+#garden-mvu-root .id-stat .data-value {
+  position: relative;
+  z-index: 1;
+}
+
+#garden-mvu-root .id-stat .data-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  opacity: 1;
+  color: #7a7575;
+  margin-bottom: 8px;
+}
+
+#garden-mvu-root .id-stat.is-metric .data-value {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+  font-size: 1.42rem;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: #2a2a2c;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* 倾斜扫光：高科技读取 */
+#garden-mvu-root .id-stat::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: 0;
+  width: 42%;
+  height: 180%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 38%,
+    rgba(255, 255, 255, 0.58) 50%,
+    rgba(255, 255, 255, 0.04) 62%,
+    transparent 100%
+  );
+  transform: translateX(-160%) skewX(-22deg);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+/* 右下角隐形水印：部分出血，由 overflow: hidden 裁切 */
+#garden-mvu-root .id-stat::after {
+  content: '';
+  position: absolute;
+  right: -14px;
+  bottom: -30px;
+  font-size: 5.4rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: #1a1a1c;
+  opacity: 0.04;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+}
+
+#garden-mvu-root .id-stat[data-mark='contrib']::after {
+  content: '⚜';
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+#garden-mvu-root .id-stat[data-mark='fund']::after {
+  content: '¥';
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+
+#garden-mvu-root .id-stat[data-mark='portrait-main']::after {
+  content: '◎';
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+#garden-mvu-root .id-stat[data-mark='portrait-sub']::after {
+  content: '◇';
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+@media (hover: hover) {
+  #garden-mvu-root .id-stat:hover {
+    border-top-color: rgba(255, 255, 255, 1);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.92),
+      0 10px 22px rgba(120, 90, 80, 0.1);
+  }
+
+  #garden-mvu-root .id-stat:hover::before {
+    animation: idDossierScan 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+@keyframes idDossierScan {
+  0% {
+    transform: translateX(-160%) skewX(-22deg);
+    opacity: 0;
+  }
+  14% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(340%) skewX(-22deg);
+    opacity: 0;
+  }
+}
+
+@keyframes emergeFromWater {
+  0% {
+    transform: translateY(20px) scale(0.95);
+    opacity: 0;
+    filter: blur(12px);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+@keyframes floatAmbient {
+  from {
+    transform: translateY(-4px);
+  }
+  to {
+    transform: translateY(4px);
+  }
 }
 
 #garden-mvu-root .id-thought {
   position: relative;
+  overflow: visible;
   margin: 0;
-  padding: 14px 16px 28px;
-  border-radius: var(--radius-md);
-  background: linear-gradient(135deg, rgba(255, 236, 220, 0.7), rgba(244, 235, 255, 0.45));
-  border-left: 3px solid var(--color-peach-deep);
+  padding: 10px 6px 18px;
+  border: none;
+  border-radius: 0;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 70%);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  -webkit-mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 60%, transparent 100%);
   cursor: pointer;
-  transition:
-    box-shadow 0.25s,
-    transform 0.25s var(--ease-spring);
+  animation:
+    emergeFromWater 1.5s ease-out both,
+    floatAmbient 4s ease-in-out 1.5s infinite alternate;
+  will-change: transform, filter, opacity;
 }
 
-#garden-mvu-root .id-thought:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgba(180, 140, 120, 0.15);
+#garden-mvu-root .id-thought::before {
+  content: none;
 }
 
 #garden-mvu-root .id-thought-label {
+  position: relative;
+  z-index: 1;
   display: block;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  opacity: 0.5;
-  margin-bottom: 6px;
-  color: var(--text-dark);
+  font-size: 0.7rem;
+  font-weight: 400;
+  letter-spacing: 4px;
+  text-transform: none;
+  opacity: 0.55;
+  margin-bottom: 0;
+  color: #8b909a;
 }
 
 #garden-mvu-root .id-thought p {
-  font-size: 0.92rem;
-  font-weight: 600;
-  line-height: 1.55;
-  color: var(--text-dark);
+  position: relative;
+  z-index: 1;
+  margin-top: 10px;
+  font-size: 1.05rem;
+  font-weight: 400;
   font-style: italic;
+  line-height: 1.85;
+  letter-spacing: 0.04em;
+  color: #5c6370;
+  text-shadow:
+    0 0 10px rgba(255, 255, 255, 0.8),
+    0 0 20px rgba(255, 255, 255, 0.4);
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
@@ -5695,52 +5896,57 @@ body {
 }
 
 #garden-mvu-root .id-thought-hint {
-  position: absolute;
-  right: 14px;
-  bottom: 8px;
-  font-size: 0.68rem;
-  font-weight: 800;
-  letter-spacing: 1px;
-  opacity: 0.45;
-  color: var(--text-secondary);
+  position: static;
+  display: block;
+  z-index: 1;
+  margin-top: 10px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  text-align: right;
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0.16em;
+  text-transform: none;
+  color: rgba(92, 99, 112, 0.42);
+  cursor: pointer;
+  transition: color 0.35s ease;
 }
 
-#garden-mvu-root .id-goal-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+#garden-mvu-root .id-thought:hover .id-thought-hint {
+  color: rgba(92, 99, 112, 0.72);
 }
 
-#garden-mvu-root .id-goal {
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  background: var(--glass-bg-subtle);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  transition:
-    transform 0.25s var(--ease-spring),
-    box-shadow 0.25s;
+#garden-mvu-root[data-theme-mode='dark'] .id-stat .data-label {
+  color: #7a7575 !important;
+  opacity: 1;
 }
 
-#garden-mvu-root .id-goal:hover {
-  transform: translateX(4px);
-  box-shadow: 0 6px 16px rgba(180, 140, 120, 0.12);
+#garden-mvu-root[data-theme-mode='dark'] .id-stat.is-metric .data-value {
+  color: #2a2a2c !important;
 }
 
-#garden-mvu-root .id-goal-label {
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text-secondary);
-  opacity: 0.7;
-  margin-bottom: 6px;
+#garden-mvu-root[data-theme-mode='dark'] .id-thought-label {
+  color: #8b909a !important;
 }
 
-#garden-mvu-root .id-goal p {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: var(--text-dark);
-  line-height: 1.5;
+#garden-mvu-root[data-theme-mode='dark'] .id-thought p {
+  color: #5c6370 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #garden-mvu-root .id-stat:hover::before {
+    animation: none;
+  }
+
+  #garden-mvu-root .id-thought,
+  #garden-mvu-root .thought-snippet {
+    animation: none;
+    filter: none;
+    opacity: 1;
+    transform: none;
+  }
 }
 
 #garden-mvu-root .id-section {
@@ -5967,7 +6173,8 @@ body {
   }
 
   #garden-mvu-root .character-card {
-    width: min(200px, calc(100% - 4px));
+    --card-body-budget: 200px;
+    width: min(200px, calc((100cqh - var(--card-body-budget)) * 832 / 1216), calc(100% - 4px));
   }
 
   #garden-mvu-root .id-card-portrait {
@@ -6089,7 +6296,8 @@ body {
   }
 
   .character-card {
-    width: min(240px, calc(100% - 8px));
+    --card-body-budget: 210px;
+    width: min(240px, calc((100cqh - var(--card-body-budget)) * 832 / 1216), calc(100% - 8px));
   }
 
   .garden-overlay {

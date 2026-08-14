@@ -106,9 +106,13 @@
 
           <div class="detail-block">
             <div class="sub-section-title">目标与行程</div>
-            <div class="affair-desc"><b>短期：</b>{{ detail.shortGoal }}</div>
-            <div class="affair-desc"><b>中期：</b>{{ detail.midGoal }}</div>
-            <div class="affair-desc"><b>之后：</b>{{ detail.nextPlan }}</div>
+            <GoalsTimeline
+              :goals="[
+                { label: '短期目标', text: detail.shortGoal },
+                { label: '中期目标', text: detail.midGoal },
+                { label: '之后行程', text: detail.nextPlan },
+              ]"
+            />
           </div>
 
           <div class="detail-block">
@@ -155,6 +159,7 @@ import { useSettingsStore } from '../settings';
 import { useDataStore } from '../store';
 import { asRecord, formatMoney, isPresent, parseOutfitChips, resolvePortraitCandidates, toPercent } from '../utils';
 import BodyStatusPanel from './BodyStatusPanel.vue';
+import GoalsTimeline from './GoalsTimeline.vue';
 import InventoryGrid from './InventoryGrid.vue';
 import OutfitGlyph from './OutfitGlyph.vue';
 import PortraitGlassLightbox from './PortraitGlassLightbox.vue';
