@@ -97,7 +97,11 @@ function watch_tavern_helper(compiler: webpack.Compiler) {
 
     compiler.hooks.done.tap('watch_tavern_helper', () => {
       console.info('\n\x1b[36m[tavern_helper]\x1b[0m 检测到完成编译, 推送更新事件...');
+<<<<<<< HEAD
       if (compiler.options.plugins.find(plugin => plugin instanceof HtmlWebpackPlugin)) {
+=======
+      if (compiler.options.plugins.some(plugin => plugin instanceof HtmlWebpackPlugin)) {
+>>>>>>> 9c69ceb712d475b9a9bd31fc9b787240061a05a5
         io.emit('message_iframe_updated');
       } else {
         io.emit('script_iframe_updated');
@@ -107,6 +111,7 @@ function watch_tavern_helper(compiler: webpack.Compiler) {
 }
 
 let watcher: FSWatcher;
+<<<<<<< HEAD
 const execute = () => {
   exec('pnpm dump', { cwd: import.meta.dirname });
   console.info('\x1b[36m[schema_dump]\x1b[0m 已将所有 schema.ts 转换为 schema.json');
@@ -116,16 +121,34 @@ function dump_schema(compiler: webpack.Compiler) {
   if (!compiler.options.watch) {
     execute_debounced();
   } else if (!watcher) {
+=======
+const dump = () => {
+  exec('pnpm dump', { cwd: import.meta.dirname });
+  console.info('\x1b[36m[schema_dump]\x1b[0m 已将所有 schema.ts 转换为 schema.json');
+};
+const dump_debounced = _.debounce(dump, 500, { leading: true, trailing: false });
+function schema_dump(compiler: webpack.Compiler) {
+  if (!compiler.options.watch) {
+    dump_debounced();
+    return;
+  }
+  if (!watcher) {
+>>>>>>> 9c69ceb712d475b9a9bd31fc9b787240061a05a5
     watcher = watch('src', {
       awaitWriteFinish: true,
     }).on('all', (_event, path) => {
       if (path.endsWith('schema.ts')) {
+<<<<<<< HEAD
         execute_debounced();
+=======
+        dump_debounced();
+>>>>>>> 9c69ceb712d475b9a9bd31fc9b787240061a05a5
       }
     });
   }
 }
 
+<<<<<<< HEAD
 /**
  * production + outputModule 时，内联后的模块可能只剩 `__webpack_require__.cjs=...`
  * 却没有声明 `__webpack_require__`，一执行就 ReferenceError → 状态栏白屏。
@@ -160,6 +183,17 @@ function fix_webpack_require_runtime(compiler: webpack.Compiler) {
 let child_process: ChildProcess;
 function watch_tavern_sync(compiler: webpack.Compiler) {
   if (!compiler.options.watch) {
+=======
+let child_process: ChildProcess;
+const bundle = () => {
+  exec('pnpm sync bundle all', { cwd: import.meta.dirname });
+  console.info('\x1b[36m[tavern_sync]\x1b[0m 已打包所有配置了的角色卡/世界书/预设');
+};
+const bundle_debounced = _.debounce(bundle, 500, { leading: true, trailing: false });
+function tavern_sync(compiler: webpack.Compiler) {
+  if (!compiler.options.watch) {
+    bundle_debounced();
+>>>>>>> 9c69ceb712d475b9a9bd31fc9b787240061a05a5
     return;
   }
   compiler.hooks.watchRun.tap('watch_tavern_sync', () => {
@@ -461,9 +495,14 @@ function parse_configuration(entry: Entry): (_env: any, argv: any) => webpack.Co
     )
       .concat(
         { apply: watch_tavern_helper },
+<<<<<<< HEAD
         { apply: dump_schema },
         { apply: watch_tavern_sync },
         { apply: fix_webpack_require_runtime },
+=======
+        { apply: schema_dump },
+        { apply: tavern_sync },
+>>>>>>> 9c69ceb712d475b9a9bd31fc9b787240061a05a5
         new VueLoaderPlugin(),
         unpluginAutoImport({
           dts: true,
@@ -476,6 +515,10 @@ function parse_configuration(entry: Entry): (_env: any, argv: any) => webpack.Co
             { from: 'klona', imports: ['klona'] },
             { from: 'vue-final-modal', imports: ['useModal'] },
             { from: 'zod', imports: ['z'] },
+<<<<<<< HEAD
+=======
+            { from: 'type-fest', imports: [['*', 'TypeFest']], type: true },
+>>>>>>> 9c69ceb712d475b9a9bd31fc9b787240061a05a5
           ],
         }),
         unpluginVueComponents({
@@ -563,7 +606,11 @@ function parse_configuration(entry: Entry): (_env: any, argv: any) => webpack.Co
       }
 
       if (
+<<<<<<< HEAD
         ['vue', 'vue-router', 'pixi.js'].every(key => request !== key) &&
+=======
+        ['vue', 'vue-router'].every(key => request !== key) &&
+>>>>>>> 9c69ceb712d475b9a9bd31fc9b787240061a05a5
         ['pixi', 'react', 'vue'].some(key => request.includes(key))
       ) {
         return callback();
@@ -577,19 +624,37 @@ function parse_configuration(entry: Entry): (_env: any, argv: any) => webpack.Co
         'vue-router': 'VueRouter',
         yaml: 'YAML',
         zod: 'z',
+<<<<<<< HEAD
         'pixi.js': 'PIXI',
+=======
+>>>>>>> 9c69ceb712d475b9a9bd31fc9b787240061a05a5
       };
       if (request in global) {
         return callback(null, 'var ' + global[request as keyof typeof global]);
       }
       const cdn = {
         sass: 'https://jspm.dev/sass',
+<<<<<<< HEAD
         // 钉死 pinia@3：unpinned /npm/pinia/+esm 会解析到 pinia@4，缺少 __VUE_PROD_DEVTOOLS__ 导致状态栏白屏
         pinia: 'https://testingcf.jsdelivr.net/npm/pinia@3.0.4/+esm',
       };
       return callback(
         null,
         'module-import ' + (cdn[request as keyof typeof cdn] ?? `https://testingcf.jsdelivr.net/npm/${request}/+esm`),
+=======
+      };
+      const package_json = JSON.parse(fs.readFileSync(path.join(import.meta.dirname, 'package.json'), 'utf-8')) as {
+        dependencies?: Record<string, string>;
+        devDependencies?: Record<string, string>;
+      };
+      const package_versions = { ...package_json.devDependencies, ...package_json.dependencies };
+      const version = package_versions[request]?.replace(/^[~^]/, '');
+      const versioned_request = /^[.\d]+$/.test(version) ? `${request}@${version}` : request;
+      return callback(
+        null,
+        'module-import ' +
+          (cdn[request as keyof typeof cdn] ?? `https://testingcf.jsdelivr.net/npm/${versioned_request}/+esm`),
+>>>>>>> 9c69ceb712d475b9a9bd31fc9b787240061a05a5
       );
     },
   });
